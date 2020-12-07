@@ -37,7 +37,9 @@ public class UserController {
 
     //delete user
     @DeleteMapping("{id}")
-    public void deleteUser (@PathVariable("id") Long id) {}
+    public void deleteUser (@PathVariable("id") Long id) {
+        service.deleteUser(id);
+    }
 
     //TODO change user password
     @PutMapping("change-password")

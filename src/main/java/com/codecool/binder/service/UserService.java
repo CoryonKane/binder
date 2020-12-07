@@ -45,6 +45,10 @@ public class UserService {
         return convert(user);
     }
 
+    public void deleteUser(Long id) {
+        repository.deleteById(id);
+    }
+
     // TODO
     public void changeUserPassword(UserPasswordDto userPasswordDto) {
     }
