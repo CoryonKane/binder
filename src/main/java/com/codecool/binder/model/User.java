@@ -23,18 +23,25 @@ public class User {
     private String profilePicture;
     // Different usernames for different platforms
     @ElementCollection
+    @Singular
     private Map<String, String> profileNames;
     @ElementCollection
+    @Singular
     private Set<String> interests;
-    @OneToMany
-    private Set<Project> favouriteProjects;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
+    @Singular
+    private Set<Project> projects;
+    @OneToMany(cascade = CascadeType.ALL)
+    @Singular
     private Set<Post> posts;
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Singular("match")
     private Set<User> matchList;
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Singular("follow")
     private Set<User> followList;
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @Singular("nope")
     private Set<User> nopeList;
 
     public void addProfileName (String platform, String profileName) {
@@ -48,11 +55,11 @@ public class User {
     }
 
     public void addProject (Project project) {
-        this.favouriteProjects.add(project);
+        this.projects.add(project);
     }
 
     public void removeProject (Project project) {
-        this.favouriteProjects.remove(project);
+        this.projects.remove(project);
     }
 
     public boolean addMatch(User user) {
@@ -91,7 +98,7 @@ public class User {
         return interests.add(s);
     }
 
-    public boolean remove(String s) {
+    public boolean removeInterest(String s) {
         return interests.remove(s);
     }
 }
