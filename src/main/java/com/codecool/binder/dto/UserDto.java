@@ -12,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+// Data Transfer Object
 public class UserDto {
     private Long id;
     private String firstName;

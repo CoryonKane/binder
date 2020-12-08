@@ -1,4 +1,4 @@
-package com.codecool.binder.dto;
+package com.codecool.binder.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserPasswordDto {
+public class UserPassword {
     private Long id;
     private String oldPassword;
     private String newPassword;

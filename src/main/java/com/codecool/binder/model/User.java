@@ -1,8 +1,13 @@
 package com.codecool.binder.model;
 
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,35 +16,51 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Entity
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue
+    // kinda private
     private Long id;
+    // public
     private String firstName;
+    // public
     private String lastName;
+    // public
     private String nickName;
+    // nagyon private
     private String password;
+    // private
     private String email;
+    // public
     private String profilePicture;
-    // Different usernames for different platforms
+    // private
+    @ElementCollection
+    private List<SimpleGrantedAuthority> roles;
+    // TODO user állíthatja egyenként hogy public vagy private
     @ElementCollection
     @Singular
     private Map<String, String> profileNames;
+    // public
     @ElementCollection
     @Singular
     private Set<String> interests;
-    @OneToMany(cascade = CascadeType.ALL)
+    // user állíthatja egyenként hogy public vagy private
+    @ElementCollection
     @Singular
-    private Set<Project> projects;
+    private Map<Project, Boolean> projects;
+    // public, followwal news feedbe kerül
     @OneToMany(cascade = CascadeType.ALL)
     @Singular
     private Set<Post> posts;
+    // csak saját magadnak settingsben
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Singular("match")
     private Set<User> matchList;
+    // csak saját magadnak settingsben
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Singular("follow")
     private Set<User> followList;
+    // csak saját magadnak settingsben
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Singular("nope")
     private Set<User> nopeList;
@@ -54,8 +75,8 @@ public class User {
         this.profileNames.remove(platform);
     }
 
-    public void addProject (Project project) {
-        this.projects.add(project);
+    public void addProject (Project project, boolean isPublic) {
+        this.projects.put(project, isPublic);
     }
 
     public void removeProject (Project project) {
@@ -100,5 +121,35 @@ public class User {
 
     public boolean removeInterest(String s) {
         return interests.remove(s);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
