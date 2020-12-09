@@ -7,6 +7,8 @@ import com.codecool.binder.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("project/")
 public class ProjectController {
@@ -23,14 +25,14 @@ public class ProjectController {
     }
 
     @PostMapping("")
-    public ProjectDto createProject (@RequestBody Project project) {
-        User sessionUser = null;
+    public ProjectDto createProject (@RequestBody Project project, Principal principal) {
+        User sessionUser = (User) principal;
         return service.saveProject(project, sessionUser);
     }
 
     @PutMapping("")
-    public ProjectDto updateProject (@RequestBody Project project) {
-        User sessionUser = null;
+    public ProjectDto updateProject (@RequestBody Project project, Principal principal) {
+        User sessionUser = (User) principal;
         return service.saveProject(project, sessionUser);
     }
 

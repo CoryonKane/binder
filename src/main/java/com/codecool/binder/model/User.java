@@ -6,10 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -36,10 +33,10 @@ public class User implements UserDetails {
     // private
     @ElementCollection
     private List<SimpleGrantedAuthority> roles;
-    // TODO user állíthatja egyenként hogy public vagy private
+    // user állíthatja egyenként hogy public vagy private
     @ElementCollection
     @Singular
-    private Map<String, String> profileNames;
+    private Map<Profile, Boolean> profileNames;
     // public
     @ElementCollection
     @Singular
@@ -65,14 +62,20 @@ public class User implements UserDetails {
     @Singular("nope")
     private Set<User> nopeList;
 
-    public void addProfileName (String platform, String profileName) {
-        if (!this.profileNames.containsKey(platform)) {
-            this.profileNames.put(platform, profileName);
+    public void addProfileName (Profile profile, boolean isPublic) {
+        Profile profInMap = hasProfile(profile);
+        if (profInMap != null) {
+            this.profileNames.remove(profInMap);
         }
+        this.profileNames.put(profile, isPublic);
     }
 
-    public void removeProfileName(String platform) {
-        this.profileNames.remove(platform);
+    public void removeProfileName(Profile profile) {
+        this.profileNames.remove(profile);
+    }
+
+    private Profile hasProfile(Profile profile) {
+        return this.profileNames.keySet().stream().filter(p -> p.getWebPage().equals(profile.getWebPage())).findFirst().orElse(null);
     }
 
     public void addProject (Project project, boolean isPublic) {

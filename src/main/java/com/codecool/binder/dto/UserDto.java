@@ -19,7 +19,7 @@ public class UserDto {
     private String lastName;
     private String nickName;
     private String profilePicture;
-    private Map<String, String> profileNames;
+    private Set<Long> profiles;
     private Set<String> interests;
     private Set<Long> projects;
     private Set<Long> posts;

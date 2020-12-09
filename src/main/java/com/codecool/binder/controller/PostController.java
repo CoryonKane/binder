@@ -5,7 +5,10 @@ import com.codecool.binder.model.Post;
 import com.codecool.binder.model.User;
 import com.codecool.binder.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("post/")
@@ -23,14 +26,14 @@ public class PostController {
     }
 
     @PostMapping("")
-    public PostDto createPost (@RequestBody Post post) {
-        User sessionUser = null;
+    public PostDto createPost (@RequestBody Post post, Principal principal) {
+        User sessionUser = (User) principal;
         return service.savePost(post, sessionUser);
     }
 
     @PutMapping("")
-    public PostDto updatePost(@RequestBody Post post) {
-        User sessionUser = null;
+    public PostDto updatePost(@RequestBody Post post, Principal principal) {
+        User sessionUser = (User) principal;
         return service.savePost(post, sessionUser);
     }
 

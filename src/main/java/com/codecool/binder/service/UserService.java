@@ -28,7 +28,9 @@ public class UserService {
 
     public UserDto convert (User u, boolean isVisible) {
         Set<Long> projects = new HashSet<>();
+        Set<Long> profiles = new HashSet<>();
         u.getProjects().forEach((k, v) -> {if (v || isVisible) {projects.add(k.getId());}});
+        u.getProfileNames().forEach((k, v) -> {if (v || isVisible) {profiles.add(k.getId());}});
         return UserDto.builder()
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
@@ -36,20 +38,18 @@ public class UserService {
                 .interests(u.getInterests())
                 .nickName(u.getNickName())
                 .profilePicture(u.getProfilePicture())
-                .profileNames(u.getProfileNames())
+                .profiles(profiles)
                 .posts(u.getPosts().stream().map(Post::getId).collect(Collectors.toSet()))
                 .projects(projects)
                 .build();
     }
 
-    // TODO convert
     public UserDto getUserDto(Long id, User sessionUser) {
         User user = repository.getOne(id);
         boolean isVisible = sessionUser.getFollowList().contains(user) || sessionUser.getMatchList().contains(user);
         return convert(user, isVisible);
     }
 
-    // TODO convert
     public UserDto saveUser(User user, boolean isVisible) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         repository.save(user);
@@ -65,7 +65,6 @@ public class UserService {
         return saveUser(user, true);
     }
 
-    // TODO
     public void changeUserPassword(User sessionUser, UserPassword userPassword) {
         if (sessionUser.getPassword().equals(passwordEncoder.encode(userPassword.getOldPassword()))) {
             sessionUser.setPassword(passwordEncoder.encode(userPassword.getNewPassword()));

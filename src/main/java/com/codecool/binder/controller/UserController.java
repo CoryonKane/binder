@@ -43,14 +43,14 @@ public class UserController {
         service.deleteUser(id);
     }
 
-    //TODO get sessionUser's lists
+    //get sessionUser's lists
     @GetMapping("lists")
     public Map<String, List<Long>> getLists (Principal principal) {
         User sessionUser = (User) principal;
         return service.getLists(sessionUser);
     }
 
-    //TODO change user password
+    //change user password
     @PutMapping("change-password")
     public void changeUserPassword (@RequestBody UserPassword userPassword, Principal principal) {
         User sessionUser = (User) principal;
