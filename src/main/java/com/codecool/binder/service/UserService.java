@@ -83,4 +83,15 @@ public class UserService {
     public UserDto getUserDtoByEmail(String dataEmail) {
         return convert(repository.findByEmail(dataEmail).orElseThrow(() -> new UsernameNotFoundException(dataEmail)), true);
     }
+
+    public void match(Long targetUserId, User sessionUser) {
+        User target = repository.getOne(targetUserId);
+        if (target.hasMatch(sessionUser)) {
+            target.removeFollow(sessionUser);
+            target.addMatch(sessionUser);
+            sessionUser.addMatch(target);
+        } else {
+            sessionUser.addFollow(target);
+        }
+    }
 }

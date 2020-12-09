@@ -155,4 +155,8 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public boolean hasMatch(User sessionUser) {
+        return this.followList.contains(sessionUser);
+    }
 }

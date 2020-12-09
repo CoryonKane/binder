@@ -56,4 +56,11 @@ public class UserController {
         User sessionUser = (User) principal;
         service.changeUserPassword(sessionUser, userPassword);
     }
+
+    //add match
+    @PostMapping("match/{id}")
+    public void match (@PathVariable("id") Long targetUserId, Principal principal) {
+        User sessionUser = (User) principal;
+        service.match(targetUserId, sessionUser);
+    }
 }
