@@ -61,4 +61,11 @@ public class UserController {
         User sessionUser = (User) principal;
         service.match(targetUserId, sessionUser);
     }
+
+    //search by interest
+    @GetMapping("")
+    public List<UserDto> searchByInterest (@RequestParam String search, Principal principal) {
+        User sessionUser = (User) principal;
+        return service.getSearchByInterest(search, sessionUser);
+    }
 }

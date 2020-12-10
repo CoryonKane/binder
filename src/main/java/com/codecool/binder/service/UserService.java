@@ -48,8 +48,7 @@ public class UserService {
 
     public UserDto getUserDto(Long id, User sessionUser) {
         User user = repository.getOne(id);
-        boolean isVisible = sessionUser.getFollowList().contains(user) || sessionUser.getMatchList().contains(user);
-        return convert(user, isVisible);
+        return convert(user, sessionUser.isFollower(user));
     }
 
     public UserDto saveUser(User user, boolean isVisible) {
@@ -95,5 +94,10 @@ public class UserService {
         } else {
             sessionUser.addFollow(target);
         }
+    }
+
+    public List<UserDto> getSearchByInterest(String search, User sessionUser) {
+        List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
+        return repository.findByInterestsIn(searches).stream().map(u -> convert(u, sessionUser.isFollower(u))).collect(Collectors.toList());
     }
 }

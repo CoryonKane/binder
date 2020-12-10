@@ -159,4 +159,8 @@ public class User implements UserDetails {
     public boolean hasMatch(User sessionUser) {
         return this.followList.contains(sessionUser);
     }
+
+    public boolean isFollower (User u) {
+        return this.followList.contains(u) || this.matchList.contains(u);
+    }
 }
