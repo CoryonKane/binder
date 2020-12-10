@@ -1,5 +1,6 @@
 package com.codecool.binder.service;
 
+import com.codecool.binder.dto.PostDto;
 import com.codecool.binder.dto.UserDto;
 import com.codecool.binder.model.UserPassword;
 import com.codecool.binder.model.Post;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserService {

@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryImplementati
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("post/")
@@ -40,5 +41,11 @@ public class PostController {
     @DeleteMapping("{id}")
     public void deletePost (@PathVariable("id") Long id) {
         service.deletePost(id);
+    }
+
+    @GetMapping("news")
+    public List<PostDto> getNews (Principal principal) {
+        User sessionUser = (User) principal;
+        return service.getNews(sessionUser);
     }
 }

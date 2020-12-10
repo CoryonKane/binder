@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -24,4 +25,5 @@ public class Post {
     private String title;
     private String description;
     private String pictureUrl;
+    private Date date;
 }
