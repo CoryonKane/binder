@@ -61,6 +61,7 @@ public class User implements UserDetails {
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @Singular("nope")
     private Set<User> nopeList;
+    // csak saját magadnak
 
     public void addProfileName (Profile profile, boolean isPublic) {
         Profile profInMap = hasProfile(profile);

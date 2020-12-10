@@ -18,13 +18,8 @@ public class Event {
     private String description;
     private String title;
     private Date date;
-    private boolean isPublic;
     @ManyToOne
     private User owner;
     @ManyToMany
     private List<User> participants;
-
-    public boolean hasParticipant(User sessionUser) {
-        return this.participants.contains(sessionUser);
-    }
 }

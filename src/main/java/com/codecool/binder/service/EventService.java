@@ -26,7 +26,6 @@ public class EventService {
                 .title(e.getTitle())
                 .description(e.getDescription())
                 .date(e.getDate())
-                .isPublic(e.isPublic())
                 .owner(e.getOwner().getId())
                 .participants(e.getParticipants().stream().map(User::getId).collect(Collectors.toList()))
                 .build();
@@ -49,7 +48,6 @@ public class EventService {
         List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
         return repository.findByTitleIsIn(searches)
                 .stream()
-                .filter(event -> event.isPublic() || event.hasParticipant(sessionUser))
                 .map(this::convert)
                 .collect(Collectors.toList());
     }
