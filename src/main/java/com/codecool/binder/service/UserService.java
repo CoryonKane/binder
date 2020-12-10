@@ -100,4 +100,9 @@ public class UserService {
         List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
         return repository.findByInterestsIn(searches).stream().map(u -> convert(u, sessionUser.isFollower(u))).collect(Collectors.toList());
     }
+
+    public List<UserDto> getSearchByUsername(String name, User sessionUser) {
+        List<String> names = Arrays.stream(name.split(",")).map(String::trim).collect(Collectors.toList());
+        return repository.findByLastNameIsInOrFirstNameIsIn(names).stream().map(u -> convert(u, sessionUser.isFollower(u))).collect(Collectors.toList());
+    }
 }
