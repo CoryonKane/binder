@@ -7,6 +7,8 @@ import com.codecool.binder.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,5 +43,14 @@ public class EventService {
 
     public void deleteEvent(Long id) {
         repository.deleteById(id);
+    }
+
+    public List<EventDto> searchEvent(String search, User sessionUser) {
+        List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
+        return repository.findByTitleIsIn(searches)
+                .stream()
+                .filter(event -> event.isPublic() || event.hasParticipant(sessionUser))
+                .map(this::convert)
+                .collect(Collectors.toList());
     }
 }

@@ -23,4 +23,8 @@ public class Event {
     private User owner;
     @ManyToMany
     private List<User> participants;
+
+    public boolean hasParticipant(User sessionUser) {
+        return this.participants.contains(sessionUser);
+    }
 }
