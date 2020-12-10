@@ -19,7 +19,7 @@ public class RegistrationController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping("")
     public UserDto registerUser (@RequestBody User user) {
         return service.registerUser(user);
     }

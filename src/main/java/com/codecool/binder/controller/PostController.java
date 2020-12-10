@@ -5,7 +5,6 @@ import com.codecool.binder.model.Post;
 import com.codecool.binder.model.User;
 import com.codecool.binder.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -22,7 +21,7 @@ public class PostController {
     }
 
     @GetMapping("{id}")
-    public PostDto getProject (@PathVariable("id") Long id) {
+    public PostDto getPost (@PathVariable("id") Long id) {
         return service.getProject(id);
     }
 

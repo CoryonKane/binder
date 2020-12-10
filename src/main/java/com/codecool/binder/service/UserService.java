@@ -1,6 +1,5 @@
 package com.codecool.binder.service;
 
-import com.codecool.binder.dto.PostDto;
 import com.codecool.binder.dto.UserDto;
 import com.codecool.binder.model.UserPassword;
 import com.codecool.binder.model.Post;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class UserService {
@@ -48,7 +46,7 @@ public class UserService {
 
     public UserDto getUserDto(Long id, User sessionUser) {
         User user = repository.getOne(id);
-        return convert(user, sessionUser.isFollower(user));
+        return convert(user, sessionUser.isMatch(user));
     }
 
     public UserDto saveUser(User user, boolean isVisible) {
@@ -98,11 +96,20 @@ public class UserService {
 
     public List<UserDto> getSearchByInterest(String search, User sessionUser) {
         List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
-        return repository.findByInterestsIn(searches).stream().map(u -> convert(u, sessionUser.isFollower(u))).collect(Collectors.toList());
+        List<User> users = new ArrayList<>();
+        searches.forEach(s -> {users.addAll(repository.findByInterestsContaining(s));});
+        return users.stream()
+                .distinct()
+                .map(user -> convert(user, sessionUser.isMatch(user)))
+                .collect(Collectors.toList());
     }
 
     public List<UserDto> getSearchByUsername(String name, User sessionUser) {
         List<String> names = Arrays.stream(name.split(",")).map(String::trim).collect(Collectors.toList());
-        return repository.findByLastNameIsInOrFirstNameIsIn(names).stream().map(u -> convert(u, sessionUser.isFollower(u))).collect(Collectors.toList());
+        return repository.findByLastNameIsInOrFirstNameIsIn(names, names)
+                .stream()
+                .distinct()
+                .map(u -> convert(u, sessionUser.isMatch(u)))
+                .collect(Collectors.toList());
     }
 }

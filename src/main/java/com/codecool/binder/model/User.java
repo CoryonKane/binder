@@ -12,7 +12,7 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
+@Entity(name = "Binder")
 public class User implements UserDetails {
     @Id
     @GeneratedValue
@@ -46,19 +46,19 @@ public class User implements UserDetails {
     @Singular
     private Map<Project, Boolean> projects;
     // public, followwal news feedbe kerül
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany
     @Singular
     private Set<Post> posts;
     // csak saját magadnak settingsben
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany
     @Singular("match")
     private Set<User> matchList;
     // csak saját magadnak settingsben
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany
     @Singular("follow")
     private Set<User> followList;
     // csak saját magadnak settingsben
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany
     @Singular("nope")
     private Set<User> nopeList;
     // csak saját magadnak
@@ -161,7 +161,7 @@ public class User implements UserDetails {
         return this.followList.contains(sessionUser);
     }
 
-    public boolean isFollower (User u) {
-        return this.followList.contains(u) || this.matchList.contains(u);
+    public boolean isMatch(User u) {
+        return this.matchList.contains(u);
     }
 }
