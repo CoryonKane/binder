@@ -9,21 +9,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Post {
+public class Profile {
     @Id
     @GeneratedValue
     private Long id;
+    private String webPage;
+    private String userName;
     @ManyToOne
     private User owner;
-    private String title;
-    private String description;
-    private String pictureUrl;
-    private Date date;
 }

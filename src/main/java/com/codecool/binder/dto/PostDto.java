@@ -1,27 +1,19 @@
-package com.codecool.binder.model;
+package com.codecool.binder.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-public class Post {
-    @Id
-    @GeneratedValue
+public class PostDto {
     private Long id;
-    @ManyToOne
-    private User owner;
+    private Long owner;
     private String title;
     private String description;
     private String pictureUrl;
