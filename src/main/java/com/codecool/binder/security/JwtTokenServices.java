@@ -74,6 +74,7 @@ public class JwtTokenServices {
         for (String role : roles) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
+        authorities.forEach(System.out::println);
         return new UsernamePasswordAuthenticationToken(username, "", authorities);
     }
 }

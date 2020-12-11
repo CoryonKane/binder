@@ -1,9 +1,7 @@
 package com.codecool.binder.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.*;
@@ -13,7 +11,7 @@ import java.util.*;
 @NoArgsConstructor
 @Builder
 @Entity(name = "Binder")
-public class User implements UserDetails {
+public class User {
     @Id
     @GeneratedValue
     // kinda private
@@ -32,35 +30,43 @@ public class User implements UserDetails {
     private String profilePicture;
     // private
     @ElementCollection
-    private List<SimpleGrantedAuthority> roles;
+    @Builder.Default
+    private List<String> roles = new ArrayList<>();
+    // private
     // user állíthatja egyenként hogy public vagy private
     @ElementCollection
     @Singular
-    private Map<Profile, Boolean> profileNames;
+    @JsonIgnore
+    private Map<Profile, Boolean> profileNames = new HashMap<>();
     // public
     @ElementCollection
     @Singular
-    private Set<String> interests;
+    private Set<String> interests = new HashSet<>();
     // user állíthatja egyenként hogy public vagy private
     @ElementCollection
     @Singular
-    private Map<Project, Boolean> projects;
+    @JsonIgnore
+    private Map<Project, Boolean> projects = new HashMap<>();
     // public, followwal news feedbe kerül
     @OneToMany
     @Singular
-    private Set<Post> posts;
+    @JsonIgnore
+    private Set<Post> posts = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("match")
-    private Set<User> matchList;
+    @JsonIgnore
+    private Set<User> matchList = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("follow")
-    private Set<User> followList;
+    @JsonIgnore
+    private Set<User> followList = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("nope")
-    private Set<User> nopeList;
+    @JsonIgnore
+    private Set<User> nopeList = new HashSet<>();
     // csak saját magadnak
 
     public void addProfileName (Profile profile, boolean isPublic) {
@@ -87,74 +93,44 @@ public class User implements UserDetails {
         this.projects.remove(project);
     }
 
-    public boolean addMatch(User user) {
-        return matchList.add(user);
+    public void addMatch(User user) {
+        matchList.add(user);
     }
 
-    public boolean removeMatch(User user) {
-        return matchList.remove(user);
+    public void removeMatch(User user) {
+        matchList.remove(user);
     }
 
-    public boolean addFollow(User user) {
-        return followList.add(user);
+    public void addFollow(User user) {
+        followList.add(user);
     }
 
-    public boolean removeFollow(User user) {
-        return followList.remove(user);
+    public void removeFollow(User user) {
+        followList.remove(user);
     }
 
-    public boolean addNope(User user) {
-        return nopeList.add(user);
+    public void addNope(User user) {
+        nopeList.add(user);
     }
 
-    public boolean removeNope(User user) {
-        return nopeList.remove(user);
+    public void removeNope(User user) {
+        nopeList.remove(user);
     }
 
-    public boolean addPost(Post post) {
-        return posts.add(post);
+    public void addPost(Post post) {
+        posts.add(post);
     }
 
-    public boolean removePost(Post post) {
-        return posts.remove(post);
+    public void removePost(Post post) {
+        posts.remove(post);
     }
 
-    public boolean addInterest(String s) {
-        return interests.add(s);
+    public void addInterest(String s) {
+        interests.add(s);
     }
 
-    public boolean removeInterest(String s) {
-        return interests.remove(s);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public void removeInterest(String s) {
+        interests.remove(s);
     }
 
     public boolean hasMatch(User sessionUser) {

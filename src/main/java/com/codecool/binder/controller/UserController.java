@@ -32,7 +32,7 @@ public class UserController {
     //update user info
     @PutMapping("")
     public UserDto updateUser (@RequestBody User user) {
-        return service.saveUser(user, true);
+        return service.registerUser(user);
     }
 
     //delete user

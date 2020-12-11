@@ -27,19 +27,18 @@ public class UserService {
     }
 
     public UserDto convert (User u, boolean isVisible) {
-        Set<Long> projects = new HashSet<>();
-        Set<Long> profiles = new HashSet<>();
+        List<Long> projects = new ArrayList<>();
+        List<Long> profiles = new ArrayList<>();
         u.getProjects().forEach((k, v) -> {if (v || isVisible) {projects.add(k.getId());}});
         u.getProfileNames().forEach((k, v) -> {if (v || isVisible) {profiles.add(k.getId());}});
         return UserDto.builder()
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
                 .id(u.getId())
-                .interests(u.getInterests())
+                .interests(new ArrayList<>(u.getInterests()))
                 .nickName(u.getNickName())
                 .profilePicture(u.getProfilePicture())
                 .profiles(profiles)
-                .posts(u.getPosts().stream().map(Post::getId).collect(Collectors.toSet()))
                 .projects(projects)
                 .build();
     }
@@ -50,7 +49,6 @@ public class UserService {
     }
 
     public UserDto saveUser(User user, boolean isVisible) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         repository.save(user);
         return convert(user, isVisible);
     }
@@ -111,5 +109,15 @@ public class UserService {
                 .distinct()
                 .map(u -> convert(u, sessionUser.isMatch(u)))
                 .collect(Collectors.toList());
+    }
+
+    // TODO delete
+    public String encode(String pw) {
+        return passwordEncoder.encode(pw);
+    }
+
+    // TODO delete
+    public User getUser (String email) {
+        return repository.findByEmail(email).orElse(null);
     }
 }
