@@ -5,6 +5,7 @@ import com.codecool.binder.model.Event;
 import com.codecool.binder.model.User;
 import com.codecool.binder.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -41,8 +42,8 @@ public class EventController {
     }
 
     @GetMapping("search")
-    public List<EventDto> searchEvents (@RequestParam String search, Principal principal) {
-        User sessionUser = (User) principal;
-        return service.searchEvent(search, sessionUser);
+    public List<EventDto> searchEvents (@RequestParam String search) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.searchEvent(search, sessionUserEmail);
     }
 }

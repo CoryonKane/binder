@@ -5,6 +5,7 @@ import com.codecool.binder.model.Event;
 import com.codecool.binder.model.User;
 import com.codecool.binder.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -14,10 +15,12 @@ import java.util.stream.Collectors;
 @Service
 public class EventService {
     private final EventRepository repository;
+    private final UserService userService;
 
     @Autowired
-    public EventService(EventRepository repository) {
+    public EventService(EventRepository repository, @Lazy UserService userService) {
         this.repository = repository;
+        this.userService = userService;
     }
 
     public EventDto convert (Event e) {
@@ -44,7 +47,8 @@ public class EventService {
         repository.deleteById(id);
     }
 
-    public List<EventDto> searchEvent(String search, User sessionUser) {
+    public List<EventDto> searchEvent(String search, String sessionUserEmail) {
+        User sessionUser = userService.getUserByEmail(sessionUserEmail);
         List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
         return repository.findByTitleIsIn(searches)
                 .stream()

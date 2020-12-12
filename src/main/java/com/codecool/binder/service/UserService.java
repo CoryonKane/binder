@@ -43,9 +43,14 @@ public class UserService {
                 .build();
     }
 
-    public UserDto getUserDto(Long id, User sessionUser) {
+    public UserDto getUserDto(Long id, String sessionUserEmail) {
         User user = repository.getOne(id);
+        User sessionUser = getUserByEmail(sessionUserEmail);
         return convert(user, sessionUser.isMatch(user));
+    }
+
+    public User getUserByEmail(String sessionUserEmail) {
+        return repository.findByEmail(sessionUserEmail).orElse(null);
     }
 
     public UserDto saveUser(User user, boolean isVisible) {
@@ -62,14 +67,16 @@ public class UserService {
         return saveUser(user, true);
     }
 
-    public void changeUserPassword(User sessionUser, UserPassword userPassword) {
+    public void changeUserPassword(String sessionUserEmail, UserPassword userPassword) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
         if (sessionUser.getPassword().equals(passwordEncoder.encode(userPassword.getOldPassword()))) {
             sessionUser.setPassword(passwordEncoder.encode(userPassword.getNewPassword()));
             repository.save(sessionUser);
         } else throw new BadCredentialsException("Wrong username or password.");
     }
 
-    public Map<String, List<Long>> getLists(User sessionUser) {
+    public Map<String, List<Long>> getLists(String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
         Map<String, List<Long>> listMap = new HashMap<>();
         listMap.put("nopeList", sessionUser.getNopeList().stream().map(User::getId).collect(Collectors.toList()));
         listMap.put("matchList", sessionUser.getMatchList().stream().map(User::getId).collect(Collectors.toList()));
@@ -81,7 +88,8 @@ public class UserService {
         return convert(repository.findByEmail(dataEmail).orElseThrow(() -> new UsernameNotFoundException(dataEmail)), true);
     }
 
-    public void match(Long targetUserId, User sessionUser) {
+    public void match(Long targetUserId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
         User target = repository.getOne(targetUserId);
         if (target.hasMatch(sessionUser)) {
             target.removeFollow(sessionUser);
@@ -92,7 +100,8 @@ public class UserService {
         }
     }
 
-    public List<UserDto> getSearchByInterest(String search, User sessionUser) {
+    public List<UserDto> getSearchByInterest(String search, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
         List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
         List<User> users = new ArrayList<>();
         searches.forEach(s -> {users.addAll(repository.findByInterestsContaining(s));});
@@ -102,22 +111,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public List<UserDto> getSearchByUsername(String name, User sessionUser) {
+    public List<UserDto> getSearchByUsername(String name, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
         List<String> names = Arrays.stream(name.split(",")).map(String::trim).collect(Collectors.toList());
         return repository.findByLastNameIsInOrFirstNameIsIn(names, names)
                 .stream()
                 .distinct()
                 .map(u -> convert(u, sessionUser.isMatch(u)))
                 .collect(Collectors.toList());
-    }
-
-    // TODO delete
-    public String encode(String pw) {
-        return passwordEncoder.encode(pw);
-    }
-
-    // TODO delete
-    public User getUser (String email) {
-        return repository.findByEmail(email).orElse(null);
     }
 }

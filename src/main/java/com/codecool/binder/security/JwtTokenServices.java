@@ -61,6 +61,7 @@ public class JwtTokenServices {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("JWT token invalid " + e);
             log.debug("JWT token invalid " + e);
         }
         return false;

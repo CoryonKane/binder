@@ -5,6 +5,7 @@ import com.codecool.binder.model.Project;
 import com.codecool.binder.model.User;
 import com.codecool.binder.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -26,14 +27,14 @@ public class ProjectController {
 
     @PostMapping("")
     public ProjectDto createProject (@RequestBody Project project, Principal principal) {
-        User sessionUser = (User) principal;
-        return service.saveProject(project, sessionUser);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.saveProject(project, sessionUserEmail);
     }
 
     @PutMapping("")
     public ProjectDto updateProject (@RequestBody Project project, Principal principal) {
-        User sessionUser = (User) principal;
-        return service.saveProject(project, sessionUser);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.saveProject(project, sessionUserEmail);
     }
 
     @DeleteMapping("{id}")
