@@ -69,7 +69,7 @@ public class UserService {
 
     public void changeUserPassword(String sessionUserEmail, UserPassword userPassword) {
         User sessionUser = getUserByEmail(sessionUserEmail);
-        if (sessionUser.getPassword().equals(passwordEncoder.encode(userPassword.getOldPassword()))) {
+        if (passwordEncoder.matches(userPassword.getOldPassword(), sessionUser.getPassword())) {
             sessionUser.setPassword(passwordEncoder.encode(userPassword.getNewPassword()));
             repository.save(sessionUser);
         } else throw new BadCredentialsException("Wrong username or password.");

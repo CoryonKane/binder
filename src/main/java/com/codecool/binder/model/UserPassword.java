@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UserPassword {
-    private Long id;
     private String oldPassword;
     private String newPassword;
 }
