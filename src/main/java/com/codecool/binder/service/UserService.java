@@ -58,8 +58,11 @@ public class UserService {
         return convert(user, isVisible);
     }
 
-    public void deleteUser(Long id) {
-        repository.deleteById(id);
+    public void deleteUser(Long id, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        if (sessionUser.getId().equals(id)) {
+            repository.deleteById(id);
+        } else throw new BadCredentialsException("Invalid user.");
     }
     
     public UserDto registerUser (User user) {
@@ -119,5 +122,12 @@ public class UserService {
                 .distinct()
                 .map(u -> convert(u, sessionUser.isMatch(u)))
                 .collect(Collectors.toList());
+    }
+
+    public UserDto updateUser(User user, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        if (sessionUser.getId().equals(user.getId())) {
+            return registerUser(user);
+        } else throw new BadCredentialsException("Invalid user.");
     }
 }

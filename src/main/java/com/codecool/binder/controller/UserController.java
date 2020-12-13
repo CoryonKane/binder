@@ -32,13 +32,15 @@ public class UserController {
     //update user info
     @PutMapping("")
     public UserDto updateUser (@RequestBody User user) {
-        return service.registerUser(user);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.updateUser(user, sessionUserEmail);
     }
 
     //delete user
     @DeleteMapping("{id}")
     public void deleteUser (@PathVariable("id") Long id) {
-        service.deleteUser(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.deleteUser(id, sessionUserEmail);
     }
 
     //get sessionUser's lists

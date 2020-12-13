@@ -25,6 +25,7 @@ public class User {
     // nagyon private
     private String password;
     // private
+    @Column(unique = true)
     private String email;
     // public
     private String profilePicture;
