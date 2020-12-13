@@ -66,9 +66,9 @@ public class UserController {
 
     //search by interest
     @GetMapping("search-interest")
-    public List<UserDto> searchByInterest (@RequestParam String search) {
+    public List<UserDto> searchByInterest (@RequestParam String interest) {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        return service.getSearchByInterest(search, sessionUserEmail);
+        return service.getSearchByInterest(interest, sessionUserEmail);
     }
 
     //search by name
