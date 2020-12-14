@@ -17,8 +17,10 @@ public class User {
     // kinda private
     private Long id;
     // public
+    @Column(nullable = false)
     private String firstName;
     // public
+    @Column(nullable = false)
     private String lastName;
     // public
     private String nickName;
@@ -76,7 +78,12 @@ public class User {
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     private Set<User> nopeList = new HashSet<>();
-    // csak saját magadnak
+    // csak saját magadnak settingsben
+    @ManyToMany
+    @Singular("ban")
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<User> banList = new HashSet<>();
 
     public void addProfileName (Profile profile, boolean isPublic) {
         Profile profInMap = hasProfile(profile);
@@ -142,11 +149,27 @@ public class User {
         interests.remove(s);
     }
 
-    public boolean hasMatch(User sessionUser) {
-        return this.followList.contains(sessionUser);
+    public void addBan (User u) {
+        this.banList.add(u);
     }
 
-    public boolean isMatch(User u) {
+    public void removeBan (User u) {
+        this.banList.remove(u);
+    }
+
+    public boolean isMatched(User u) {
         return this.matchList.contains(u);
+    }
+
+    public boolean isFollowed(User target) {
+        return this.followList.contains(target);
+    }
+
+    public boolean isNoped(User target) {
+        return this.nopeList.contains(target);
+    }
+
+    public boolean isBanned (User u) {
+        return this.banList.contains(u);
     }
 }

@@ -80,8 +80,8 @@ public class UserController {
 
     //search by name
     @GetMapping("search-name")
-    public List<UserDto> searchByUsername (@RequestParam String name) {
+    public List<UserDto> searchByName(@RequestParam String name) {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        return service.getSearchByUsername(name, sessionUserEmail);
+        return service.getSearchByName(name, sessionUserEmail);
     }
 }

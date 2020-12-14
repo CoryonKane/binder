@@ -61,6 +61,7 @@ public class PostService {
                 .collect(Collectors.toList());
         return repository.findByOwnerIsIn(users)
                 .stream()
+                .filter(post -> !post.getOwner().isNoped(sessionUser))
                 .map(this::convert)
                 .sorted(Comparator.comparing(PostDto::getDate))
                 .collect(Collectors.toList());

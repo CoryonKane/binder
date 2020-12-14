@@ -20,7 +20,7 @@ public class RegistrationController {
     }
 
     @PostMapping("")
-    public void registerUser (@RequestBody User user) {
-        service.registerUser(user);
+    public UserDto registerUser (@RequestBody User user) {
+        return service.registerUser(user);
     }
 }
