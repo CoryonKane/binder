@@ -32,12 +32,14 @@ public class User {
     // private
     @ElementCollection
     @Builder.Default
+    @EqualsAndHashCode.Exclude
     private List<String> roles = new ArrayList<>();
     // private
     // user állíthatja egyenként hogy public vagy private
     @ElementCollection
     @Singular
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Map<Profile, Boolean> profileNames = new HashMap<>();
     // public
     @ElementCollection
@@ -47,26 +49,31 @@ public class User {
     @ElementCollection
     @Singular
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Map<Project, Boolean> projects = new HashMap<>();
     // public, followwal news feedbe kerül
     @OneToMany
     @Singular
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Set<Post> posts = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("match")
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Set<User> matchList = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("follow")
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Set<User> followList = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("nope")
     @JsonIgnore
+    @EqualsAndHashCode.Exclude
     private Set<User> nopeList = new HashSet<>();
     // csak saját magadnak
 

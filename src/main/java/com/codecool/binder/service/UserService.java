@@ -94,13 +94,18 @@ public class UserService {
     public void match(Long targetUserId, String sessionUserEmail) {
         User sessionUser = getUserByEmail(sessionUserEmail);
         User target = repository.getOne(targetUserId);
+        if (sessionUser.equals(target)) {
+            return;
+        }
         if (target.hasMatch(sessionUser)) {
             target.removeFollow(sessionUser);
             target.addMatch(sessionUser);
             sessionUser.addMatch(target);
+            repository.save(target);
         } else {
             sessionUser.addFollow(target);
         }
+        repository.save(sessionUser);
     }
 
     public List<UserDto> getSearchByInterest(String search, String sessionUserEmail) {
