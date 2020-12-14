@@ -23,9 +23,10 @@ public class User {
     // public
     private String nickName;
     // nagyon private
+    @Column(nullable = false)
     private String password;
     // private
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
     // public
     private String profilePicture;

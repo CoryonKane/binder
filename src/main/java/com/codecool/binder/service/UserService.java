@@ -54,7 +54,7 @@ public class UserService {
 
     public UserDto saveUser(User user, boolean isVisible) {
         repository.save(user);
-        return convert(user, isVisible);
+        return getUserDtoByEmail(user.getEmail(), isVisible);
     }
 
     public void deleteUser(Long id, String sessionUserEmail) {
@@ -63,10 +63,19 @@ public class UserService {
             repository.deleteById(id);
         } else throw new BadCredentialsException("Invalid user.");
     }
-    
-    public UserDto registerUser (User user) {
+
+    public void registerUser (User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return saveUser(user, true);
+        if (repository.findByEmail(user.getEmail()).isEmpty()) {
+            saveUser(user, true);
+        }
+    }
+
+    public UserDto updateUser(User user, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        if (sessionUser.getId().equals(user.getId())) {
+            return saveUser(user, true);
+        } else throw new BadCredentialsException("Invalid user.");
     }
 
     public void changeUserPassword(String sessionUserEmail, UserPassword userPassword) {
@@ -85,9 +94,9 @@ public class UserService {
         listMap.put("followList", sessionUser.getFollowList().stream().map(User::getId).collect(Collectors.toList()));
         return listMap;
     }
-    
-    public UserDto getUserDtoByEmail(String dataEmail) {
-        return convert(repository.findByEmail(dataEmail).orElseThrow(() -> new UsernameNotFoundException(dataEmail)), true);
+
+    public UserDto getUserDtoByEmail(String dataEmail, boolean isVisible) {
+        return convert(repository.findByEmail(dataEmail).orElseThrow(() -> new UsernameNotFoundException(dataEmail)), isVisible);
     }
 
     public void match(Long targetUserId, String sessionUserEmail) {
@@ -135,12 +144,5 @@ public class UserService {
                 .distinct()
                 .map(u -> convert(u, sessionUser.isMatch(u)))
                 .collect(Collectors.toList());
-    }
-
-    public UserDto updateUser(User user, String sessionUserEmail) {
-        User sessionUser = getUserByEmail(sessionUserEmail);
-        if (sessionUser.getId().equals(user.getId())) {
-            return registerUser(user);
-        } else throw new BadCredentialsException("Invalid user.");
     }
 }

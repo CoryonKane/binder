@@ -40,7 +40,7 @@ public class LoginController {
     public ResponseEntity<Object> login(@RequestBody UserCredentials data) {
         try {
             String dataEmail = data.getEmail();
-            UserDto user = userService.getUserDtoByEmail(dataEmail);
+            UserDto user = userService.getUserDtoByEmail(dataEmail, true);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dataEmail, data.getPassword()));
             List<String> roles = authentication.getAuthorities()
                     .stream()
