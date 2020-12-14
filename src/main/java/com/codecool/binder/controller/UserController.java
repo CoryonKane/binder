@@ -64,6 +64,13 @@ public class UserController {
         service.match(targetUserId, sessionUserEmail);
     }
 
+    //add nope
+    @PostMapping("nope/{id}")
+    public void nope (@PathVariable("id") Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.nope(targetId, sessionUserEmail);
+    }
+
     //search by interest
     @GetMapping("search-interest")
     public List<UserDto> searchByInterest (@RequestParam String interest) {

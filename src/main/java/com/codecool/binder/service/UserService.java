@@ -2,7 +2,6 @@ package com.codecool.binder.service;
 
 import com.codecool.binder.dto.UserDto;
 import com.codecool.binder.model.UserPassword;
-import com.codecool.binder.model.Post;
 import com.codecool.binder.model.User;
 import com.codecool.binder.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,11 +107,20 @@ public class UserService {
         repository.save(sessionUser);
     }
 
+    public void nope(Long targetId, String sessionUserEmail) {
+        User user = getUserByEmail(sessionUserEmail);
+        User target = repository.getOne(targetId);
+        if (!user.equals(target)) {
+            user.addNope(target);
+            repository.save(user);
+        } else throw new BadCredentialsException("Invalid user.");
+    }
+
     public List<UserDto> getSearchByInterest(String search, String sessionUserEmail) {
         User sessionUser = getUserByEmail(sessionUserEmail);
         List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
         List<User> users = new ArrayList<>();
-        searches.forEach(s -> {users.addAll(repository.findByInterestsContaining(s));});
+        searches.forEach(s -> users.addAll(repository.findByInterestsContaining(s)));
         return users.stream()
                 .distinct()
                 .map(user -> convert(user, sessionUser.isMatch(user)))
