@@ -85,6 +85,20 @@ public class UserController {
         service.removeBan(targetId, sessionUserEmail);
     }
 
+    //add interest
+    @PutMapping("add-interest")
+    public List<String> addInterest (@RequestBody String interest) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.addInterest(interest, sessionUserEmail);
+    }
+
+    //remove interest
+    @DeleteMapping("remove-interest")
+    public List<String> removeInterest (@RequestBody String interest) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.removeInterest(interest, sessionUserEmail);
+    }
+
     //search by interest
     @GetMapping("search-interest")
     public List<UserDto> searchByInterest (@RequestParam String interest) {

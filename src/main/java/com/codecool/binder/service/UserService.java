@@ -192,4 +192,18 @@ public class UserService {
                 .map(u -> convert(u, sessionUser.isMatched(u)))
                 .collect(Collectors.toList());
     }
+
+    public List<String> addInterest(String interest, String sessionUserEmail) {
+        User user = getUserByEmail(sessionUserEmail);
+        user.addInterest(interest);
+        repository.save(user);
+        return new ArrayList<>(user.getInterests());
+    }
+
+    public List<String> removeInterest(String interest, String sessionUserEmail) {
+        User user = getUserByEmail(sessionUserEmail);
+        user.removeInterest(interest);
+        repository.save(user);
+        return new ArrayList<>(user.getInterests());
+    }
 }
