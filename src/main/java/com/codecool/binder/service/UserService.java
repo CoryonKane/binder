@@ -162,6 +162,13 @@ public class UserService {
         repository.save(sessionUser);
     }
 
+    public void removeBan(Long targetId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        User target = repository.getOne(targetId);
+        sessionUser.removeBan(target);
+        repository.save(sessionUser);
+    }
+
     public List<UserDto> getSearchByInterest(String interest, String sessionUserEmail) {
         User sessionUser = getUserByEmail(sessionUserEmail);
         List<String> searches = Arrays.stream(interest.split(",")).map(String::trim).collect(Collectors.toList());

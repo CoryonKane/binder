@@ -78,6 +78,13 @@ public class UserController {
         service.ban(targetId, sessionUserEmail);
     }
 
+    //remove ban on user
+    @PostMapping("un-ban")
+    public void unBan (@RequestBody Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.removeBan(targetId, sessionUserEmail);
+    }
+
     //search by interest
     @GetMapping("search-interest")
     public List<UserDto> searchByInterest (@RequestParam String interest) {
