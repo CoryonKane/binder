@@ -33,7 +33,7 @@ public class EventController {
     @PutMapping("")
     public EventDto updateEvent (@RequestBody Event event) {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        return service.createEvent(event, sessionUserEmail);
+        return service.updateEvent(event, sessionUserEmail);
     }
 
     @DeleteMapping("{id}")

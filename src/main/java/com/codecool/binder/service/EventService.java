@@ -35,7 +35,7 @@ public class EventService {
                 .build();
     }
 
-    public EventDto getEventById (Long id, String sessionUserEmail) {
+    public EventDto getEventById (Long id) {
         return convert(repository.getOne(id));
     }
 
