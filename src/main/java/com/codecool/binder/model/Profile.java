@@ -22,7 +22,6 @@ public class Profile {
     private String userName;
     @Column(nullable = false)
     private boolean visible;
-    @ManyToOne
-    @Column(nullable = false)
+    @ManyToOne(optional = false)
     private User owner;
 }

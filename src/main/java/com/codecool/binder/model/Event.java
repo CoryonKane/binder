@@ -4,7 +4,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -16,10 +17,12 @@ public class Event {
     @GeneratedValue
     private Long id;
     private String description;
+    @Column(nullable = false)
     private String title;
+    @Column(nullable = false)
     private Date date;
-    @ManyToOne
+    @ManyToOne(optional = false)
     private User owner;
     @ManyToMany
-    private List<User> participants;
+    private Set<User> participants = new HashSet<>();
 }

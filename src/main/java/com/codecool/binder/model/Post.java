@@ -17,8 +17,7 @@ public class Post {
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne
-    @Column(nullable = false)
+    @ManyToOne(optional = false)
     private User owner;
     @Column(nullable = false)
     private String title;

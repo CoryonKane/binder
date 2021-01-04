@@ -22,7 +22,6 @@ public class Project {
     private String description;
     @Column(nullable = false)
     private boolean visible;
-    @ManyToOne
-    @Column(nullable = false)
+    @ManyToOne(optional = false)
     private User owner;
 }
