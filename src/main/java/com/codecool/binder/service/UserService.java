@@ -145,6 +145,13 @@ public class UserService {
         repository.save(sessionUser);
     }
 
+    public void removeNope(Long targetId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        User target = repository.getOne(targetId);
+        sessionUser.removeNope(target);
+        repository.save(sessionUser);
+    }
+
     public void ban(Long targetId, String sessionUserEmail) {
         User sessionUser = getUserByEmail(sessionUserEmail);
         User target = repository.getOne(targetId);

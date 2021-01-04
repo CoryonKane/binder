@@ -71,6 +71,13 @@ public class UserController {
         service.nope(targetId, sessionUserEmail);
     }
 
+    //remove nope
+    @PostMapping("remove-nope")
+    public void removeNope (@RequestBody Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.removeNope(targetId, sessionUserEmail);
+    }
+
     //add banned user
     @PostMapping("ban")
     public void ban (@RequestBody Long targetId) {
@@ -79,7 +86,7 @@ public class UserController {
     }
 
     //remove ban on user
-    @PostMapping("un-ban")
+    @PostMapping("remove-ban")
     public void unBan (@RequestBody Long targetId) {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         service.removeBan(targetId, sessionUserEmail);
