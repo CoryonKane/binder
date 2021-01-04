@@ -33,7 +33,7 @@ public class ProjectService {
     public ProjectDto getProject (Long id, String sessionUserName) {
         User user = userService.getUserByEmail(sessionUserName);
         Project p = repository.getOne(id);
-        if (p.getOwner().getId().equals(user.getId())) {
+        if (p.getOwner().equals(user) || p.isVisible() || p.getOwner().isMatched(user)) {
             return convert(p);
         } else throw new BadCredentialsException("Access denied.");
     }
