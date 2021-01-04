@@ -86,22 +86,6 @@ public class User {
     @EqualsAndHashCode.Exclude
     private Set<User> banList = new HashSet<>();
 
-    public void addProfileName (Profile profile) {
-        this.profileNames.add(profile);
-    }
-
-    public void removeProfileName(Profile profile) {
-        this.profileNames.remove(profile);
-    }
-
-    public void addProject (Project project) {
-        this.projects.add(project);
-    }
-
-    public void removeProject (Project project) {
-        this.projects.remove(project);
-    }
-
     public void addMatch(User user) {
         matchList.add(user);
     }
@@ -124,14 +108,6 @@ public class User {
 
     public void removeNope(User user) {
         nopeList.remove(user);
-    }
-
-    public void addPost(Post post) {
-        posts.add(post);
-    }
-
-    public void removePost(Post post) {
-        posts.remove(post);
     }
 
     public boolean isPostOwner(Long id) {

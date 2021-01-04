@@ -31,11 +31,11 @@ public class ProjectService {
     }
 
     public ProjectDto getProject (Long id, String sessionUserName) {
-        User user = userService.getUserByEmail(sessionUserName);
+//        User user = userService.getUserByEmail(sessionUserName);
         Project p = repository.getOne(id);
-        if (p.getOwner().equals(user) || p.isVisible() || p.getOwner().isMatched(user)) {
-            return convert(p);
-        } else throw new BadCredentialsException("Access denied.");
+//        if (p.getOwner().equals(user) || p.isVisible() || p.getOwner().isMatched(user)) {
+        return convert(p);
+//        } else throw new BadCredentialsException("Access denied.");
     }
 
     public ProjectDto createProject (Project project, String sessionUserEmail) {
