@@ -145,6 +145,23 @@ public class UserService {
         repository.save(sessionUser);
     }
 
+    public void ban(Long targetId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        User target = repository.getOne(targetId);
+        if (sessionUser.equals(target) || sessionUser.isBanned(target)) {
+            return;
+        }
+        if (sessionUser.isMatched(target)) {
+            sessionUser.removeMatch(target);
+            target.removeMatch(sessionUser);
+        }
+        if (sessionUser.isFollowed(target)) {
+            sessionUser.removeFollow(target);
+        }
+        sessionUser.addBan(target);
+        repository.save(sessionUser);
+    }
+
     public List<UserDto> getSearchByInterest(String interest, String sessionUserEmail) {
         User sessionUser = getUserByEmail(sessionUserEmail);
         List<String> searches = Arrays.stream(interest.split(",")).map(String::trim).collect(Collectors.toList());

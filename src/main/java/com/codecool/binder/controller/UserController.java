@@ -58,17 +58,24 @@ public class UserController {
     }
 
     //add match
-    @PostMapping("match/{id}")
-    public void match (@PathVariable("id") Long targetUserId) {
+    @PostMapping("match")
+    public void match (@RequestBody Long targetId) {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        service.match(targetUserId, sessionUserEmail);
+        service.match(targetId, sessionUserEmail);
     }
 
     //add nope
-    @PostMapping("nope/{id}")
-    public void nope (@PathVariable("id") Long targetId) {
+    @PostMapping("nope")
+    public void nope (@RequestBody Long targetId) {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         service.nope(targetId, sessionUserEmail);
+    }
+
+    //add banned user
+    @PostMapping("ban")
+    public void ban (@RequestBody Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.ban(targetId, sessionUserEmail);
     }
 
     //search by interest
@@ -84,4 +91,5 @@ public class UserController {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         return service.getSearchByName(name, sessionUserEmail);
     }
+
 }
