@@ -16,9 +16,11 @@ public class Project {
     @Id
     @GeneratedValue
     private Long id;
+    @Column(nullable = false)
     private String url;
     private String title;
     private String description;
+    @Column(nullable = false)
     private boolean visible;
     @ManyToOne
     @Column(nullable = false)

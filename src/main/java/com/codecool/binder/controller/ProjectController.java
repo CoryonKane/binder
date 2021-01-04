@@ -21,7 +21,8 @@ public class ProjectController {
 
     @GetMapping("{id}")
     public ProjectDto getProject (@PathVariable("id") Long id) {
-        return service.getProject(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.getProject(id, sessionUserEmail);
     }
 
     @PostMapping("")
@@ -38,6 +39,7 @@ public class ProjectController {
 
     @DeleteMapping("{id}")
     public void deleteProject (@PathVariable("id") Long id) {
-        service.deleteProject(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.deleteProject(id, sessionUserEmail);
     }
 }

@@ -30,9 +30,12 @@ public class ProjectService {
                 .build();
     }
 
-    public ProjectDto getProject (Long id) {
+    public ProjectDto getProject (Long id, String sessionUserName) {
+        User user = userService.getUserByEmail(sessionUserName);
         Project p = repository.getOne(id);
-        return convert(p);
+        if (p.getOwner().getId().equals(user.getId())) {
+            return convert(p);
+        } else throw new BadCredentialsException("Access denied.");
     }
 
     public ProjectDto createProject (Project project, String sessionUserEmail) {
@@ -51,7 +54,11 @@ public class ProjectService {
         } else throw new BadCredentialsException("Access denied.");
     }
 
-    public void deleteProject (Long id) {
-        repository.deleteById(id);
+    public void deleteProject (Long id, String sessionUserName) {
+        User user = userService.getUserByEmail(sessionUserName);
+        Project p = repository.getOne(id);
+        if (p.getOwner().getId().equals(user.getId())) {
+            repository.deleteById(id);
+        } else throw new BadCredentialsException("Access denied.");
     }
 }
