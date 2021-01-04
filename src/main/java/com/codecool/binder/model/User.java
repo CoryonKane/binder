@@ -50,11 +50,11 @@ public class User {
     @Singular
     private Set<String> interests = new HashSet<>();
     // user állíthatja egyenként hogy public vagy private
-    @ElementCollection
+    @OneToMany
     @Singular
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private Map<Project, Boolean> projects = new HashMap<>();
+    private Set<Project> projects = new HashSet<>();
     // public, followwal news feedbe kerül
     @OneToMany
     @Singular
@@ -102,8 +102,8 @@ public class User {
         return this.profileNames.keySet().stream().filter(p -> p.getWebPage().equals(profile.getWebPage())).findFirst().orElse(null);
     }
 
-    public void addProject (Project project, boolean isPublic) {
-        this.projects.put(project, isPublic);
+    public void addProject (Project project) {
+        this.projects.add(project);
     }
 
     public void removeProject (Project project) {
