@@ -29,7 +29,7 @@ public class UserService {
         List<Long> projects = new ArrayList<>();
         List<Long> profiles = new ArrayList<>();
         u.getProjects().forEach(p -> {if (p.isVisible() || isVisible) {projects.add(p.getId());}});
-        u.getProfileNames().forEach((k, v) -> {if (v || isVisible) {profiles.add(k.getId());}});
+        u.getProfileNames().forEach(p -> {if (p.isVisible() || isVisible) {profiles.add(p.getId());}});
         return UserDto.builder()
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())

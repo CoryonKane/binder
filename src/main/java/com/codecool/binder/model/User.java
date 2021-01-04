@@ -40,11 +40,11 @@ public class User {
     private List<String> roles = new ArrayList<>();
     // private
     // user állíthatja egyenként hogy public vagy private
-    @ElementCollection
+    @OneToMany
     @Singular
     @JsonIgnore
     @EqualsAndHashCode.Exclude
-    private Map<Profile, Boolean> profileNames = new HashMap<>();
+    private Set<Profile> profileNames = new HashSet<>();
     // public
     @ElementCollection
     @Singular
@@ -86,20 +86,12 @@ public class User {
     @EqualsAndHashCode.Exclude
     private Set<User> banList = new HashSet<>();
 
-    public void addProfileName (Profile profile, boolean isPublic) {
-        Profile profInMap = hasProfile(profile);
-        if (profInMap != null) {
-            this.profileNames.remove(profInMap);
-        }
-        this.profileNames.put(profile, isPublic);
+    public void addProfileName (Profile profile) {
+        this.profileNames.add(profile);
     }
 
     public void removeProfileName(Profile profile) {
         this.profileNames.remove(profile);
-    }
-
-    private Profile hasProfile(Profile profile) {
-        return this.profileNames.keySet().stream().filter(p -> p.getWebPage().equals(profile.getWebPage())).findFirst().orElse(null);
     }
 
     public void addProject (Project project) {
