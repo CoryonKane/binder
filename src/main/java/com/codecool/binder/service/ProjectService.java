@@ -6,6 +6,7 @@ import com.codecool.binder.model.User;
 import com.codecool.binder.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,14 +35,23 @@ public class ProjectService {
         return convert(p);
     }
 
-    public ProjectDto saveProject(Project project, String sessionUserEmail) {
+    public ProjectDto createProject (Project project, String sessionUserEmail) {
         User sessionUser = userService.getUserByEmail(sessionUserEmail);
+        project.setId(null);
         project.setOwner(sessionUser);
         repository.save(project);
-        return convert(project);
+        return convert(repository.getOne(project.getId()));
     }
 
-    public void deleteProject(Long id) {
+    public ProjectDto updateProject (Project project, String sessionUserEmail) {
+        User user = userService.getUserByEmail(sessionUserEmail);
+        if (project.getOwner().getId().equals(user.getId())) {
+            repository.save(project);
+            return convert(repository.getOne(project.getId()));
+        } else throw new BadCredentialsException("Access denied.");
+    }
+
+    public void deleteProject (Long id) {
         repository.deleteById(id);
     }
 }

@@ -2,7 +2,6 @@ package com.codecool.binder.controller;
 
 import com.codecool.binder.dto.ProjectDto;
 import com.codecool.binder.model.Project;
-import com.codecool.binder.model.User;
 import com.codecool.binder.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,13 +27,13 @@ public class ProjectController {
     @PostMapping("")
     public ProjectDto createProject (@RequestBody Project project, Principal principal) {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        return service.saveProject(project, sessionUserEmail);
+        return service.createProject(project, sessionUserEmail);
     }
 
     @PutMapping("")
     public ProjectDto updateProject (@RequestBody Project project, Principal principal) {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        return service.saveProject(project, sessionUserEmail);
+        return service.updateProject(project, sessionUserEmail);
     }
 
     @DeleteMapping("{id}")
