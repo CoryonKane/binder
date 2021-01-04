@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -139,6 +140,10 @@ public class User {
 
     public void removePost(Post post) {
         posts.remove(post);
+    }
+
+    public boolean isPostOwner(Long id) {
+        return this.posts.stream().map(Post::getId).collect(Collectors.toList()).contains(id);
     }
 
     public void addInterest(String s) {

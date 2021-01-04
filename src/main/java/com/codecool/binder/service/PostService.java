@@ -6,6 +6,7 @@ import com.codecool.binder.model.User;
 import com.codecool.binder.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -41,18 +42,28 @@ public class PostService {
         return convert(p);
     }
 
-    public PostDto savePost(Post post, String sessionUserEmail) {
+    public PostDto updatePost(Post post, String sessionUserEmail) {
         User sessionUser = userService.getUserByEmail(sessionUserEmail);
-        if (post.getDate() != null) {
-            post.setDate(new Date());
-        }
-        post.setOwner(sessionUser);
-        repository.save(post);
-        return convert(post);
+        if (post.getOwner().getId().equals(sessionUser.getId())) {
+            repository.save(post);
+            return convert(repository.getOne(post.getId()));
+        } else throw new BadCredentialsException("Access denied.");
     }
 
-    public void deletePost(Long id) {
-        repository.deleteById(id);
+    public PostDto createPost (Post post, String sessionUserEmail) {
+        User sessionUser = userService.getUserByEmail(sessionUserEmail);
+        post.setDate(new Date());
+        post.setId(null);
+        post.setOwner(sessionUser);
+        repository.save(post);
+        return convert(repository.getOne(post.getId()));
+    }
+
+    public void deletePost(Long id, String sessionUserEmail) {
+        User sessionUser = userService.getUserByEmail(sessionUserEmail);
+        if (sessionUser.isPostOwner(id)) {
+            repository.deleteById(id);
+        } else throw new BadCredentialsException("Access denied.");
     }
 
     public List<PostDto> getNews(String sessionUserEmail) {

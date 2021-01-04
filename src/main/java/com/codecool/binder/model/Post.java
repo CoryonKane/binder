@@ -5,10 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -21,9 +18,12 @@ public class Post {
     @GeneratedValue
     private Long id;
     @ManyToOne
+    @Column(nullable = false)
     private User owner;
+    @Column(nullable = false)
     private String title;
     private String description;
     private String pictureUrl;
+    @Column(nullable = false)
     private Date date;
 }
