@@ -26,22 +26,24 @@ public class EventController {
 
     @PostMapping("")
     public EventDto createEvent (@RequestBody Event event) {
-        return service.saveEvent(event);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.createEvent(event, sessionUserEmail);
     }
 
     @PutMapping("")
     public EventDto updateEvent (@RequestBody Event event) {
-        return service.saveEvent(event);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.createEvent(event, sessionUserEmail);
     }
 
     @DeleteMapping("{id}")
     public void deleteEvent (@PathVariable("id") Long id) {
-        service.deleteEvent(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.deleteEvent(id, sessionUserEmail);
     }
 
     @GetMapping("search")
     public List<EventDto> searchEvents (@RequestParam String eventTitle) {
-        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        return service.searchEvent(eventTitle, sessionUserEmail);
+        return service.searchEvent(eventTitle);
     }
 }

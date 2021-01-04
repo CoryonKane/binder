@@ -6,6 +6,7 @@ import com.codecool.binder.model.User;
 import com.codecool.binder.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -34,21 +35,35 @@ public class EventService {
                 .build();
     }
 
-    public EventDto getEventById(Long id) {
+    public EventDto getEventById (Long id, String sessionUserEmail) {
         return convert(repository.getOne(id));
     }
 
-    public EventDto saveEvent(Event event) {
+    public EventDto createEvent (Event event, String sessionUserEmail) {
+        User user = userService.getUserByEmail(sessionUserEmail);
+        event.setOwner(user);
+        event.setId(null);
         repository.save(event);
         return convert(event);
     }
 
-    public void deleteEvent(Long id) {
-        repository.deleteById(id);
+    public EventDto updateEvent (Event event, String sessionUserEmail) {
+        User user = userService.getUserByEmail(sessionUserEmail);
+        if (event.getOwner().equals(user)) {
+            repository.save(event);
+            return convert(repository.getOne(event.getId()));
+        } else throw new BadCredentialsException("Access denied.");
     }
 
-    public List<EventDto> searchEvent(String search, String sessionUserEmail) {
-        User sessionUser = userService.getUserByEmail(sessionUserEmail);
+    public void deleteEvent (Long id, String sessionUserEmail) {
+        Event event = repository.getOne(id);
+        User user = userService.getUserByEmail(sessionUserEmail);
+        if (event.getOwner().equals(user)) {
+            repository.deleteById(id);
+        } else throw new BadCredentialsException("Access denied.");
+    }
+
+    public List<EventDto> searchEvent(String search) {
         List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
         return repository.findByTitleIsIn(searches)
                 .stream()
