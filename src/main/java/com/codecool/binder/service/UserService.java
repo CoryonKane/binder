@@ -77,6 +77,7 @@ public class UserService {
     public UserDto updateUser(User user, String sessionUserEmail) {
         User sessionUser = getUserByEmail(sessionUserEmail);
         if (sessionUser.getId().equals(user.getId())) {
+            user.setPassword(sessionUser.getPassword());
             return saveUser(user, true);
         } else throw new BadCredentialsException("Invalid user.");
     }
