@@ -110,10 +110,6 @@ public class User {
         nopeList.remove(user);
     }
 
-    public boolean isPostOwner(Long id) {
-        return this.posts.stream().map(Post::getId).collect(Collectors.toList()).contains(id);
-    }
-
     public void addInterest(String s) {
         interests.add(s);
     }
@@ -128,6 +124,10 @@ public class User {
 
     public void removeBan (User u) {
         this.banList.remove(u);
+    }
+
+    public boolean isPostOwner(Post post) {
+        return this.posts.contains(post);
     }
 
     public boolean isMatched(User u) {

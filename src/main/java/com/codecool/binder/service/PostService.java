@@ -61,7 +61,8 @@ public class PostService {
 
     public void deletePost(Long id, String sessionUserEmail) {
         User sessionUser = userService.getUserByEmail(sessionUserEmail);
-        if (sessionUser.isPostOwner(id)) {
+        Post post = repository.getOne(id);
+        if (post.getOwner().equals(sessionUser)) {
             repository.deleteById(id);
         } else throw new BadCredentialsException("Access denied.");
     }
