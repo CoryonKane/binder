@@ -1,6 +1,8 @@
 package com.codecool.binder.service;
 
 import com.codecool.binder.dto.UserDto;
+import com.codecool.binder.model.Profile;
+import com.codecool.binder.model.Project;
 import com.codecool.binder.model.UserPassword;
 import com.codecool.binder.model.User;
 import com.codecool.binder.repository.UserRepository;
@@ -27,10 +29,6 @@ public class UserService {
     }
 
     public UserDto convert (User u, boolean isVisible) {
-        List<Long> projects = new ArrayList<>();
-        List<Long> profiles = new ArrayList<>();
-        u.getProjects().forEach(p -> {if (p.isVisible() || isVisible) {projects.add(p.getId());}});
-        u.getProfileNames().forEach(p -> {if (p.isVisible() || isVisible) {profiles.add(p.getId());}});
         return UserDto.builder()
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
@@ -38,8 +36,15 @@ public class UserService {
                 .interests(new ArrayList<>(u.getInterests()))
                 .nickName(u.getNickName())
                 .profilePicture(u.getProfilePicture())
-                .profiles(profiles)
-                .projects(projects)
+                .profiles(u.getProfileNames()
+                        .stream()
+                        .filter(profile -> profile.isVisible() || isVisible)
+                        .map(Profile::getId)
+                        .collect(Collectors.toList()))
+                .projects(u.getProjects()
+                        .stream()
+                        .map(Project::getId)
+                        .collect(Collectors.toList()))
                 .build();
     }
 
@@ -50,10 +55,6 @@ public class UserService {
             return convert(user, sessionUser.isMatched(user));
         } else throw new AccessDeniedException("Banned user.");
     }
-
-//    public User getUserById (Long id) {
-//        return repository.getOne(id);
-//    }
 
     public User getUserByEmail(String sessionUserEmail) {
         return repository.findByEmail(sessionUserEmail).orElse(null);

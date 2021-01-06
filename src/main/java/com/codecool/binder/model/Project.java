@@ -20,8 +20,6 @@ public class Project {
     private String url;
     private String title;
     private String description;
-    @Column(nullable = false)
-    private boolean visible;
     @ManyToOne(optional = false)
     private User owner;
 }
