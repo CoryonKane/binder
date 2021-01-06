@@ -20,6 +20,8 @@ public class Event {
     @Column(nullable = false)
     private String title;
     @Column(nullable = false)
+    private boolean visible;
+    @Column(nullable = false)
     private Date date;
     @ManyToOne(optional = false)
     private User owner;
@@ -32,5 +34,9 @@ public class Event {
 
     public void removeParticipant (User user) {
         this.participants.remove(user);
+    }
+
+    public boolean isParticipant (User user) {
+        return this.participants.contains(user);
     }
 }

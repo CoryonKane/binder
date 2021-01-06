@@ -63,10 +63,13 @@ public class EventService {
         } else throw new BadCredentialsException("Access denied.");
     }
 
-    public List<EventDto> searchEvent(String search) {
+    public List<EventDto> searchEvent(String search, String sessionUserEmail) {
         List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
+        User user = userService.getUserByEmail(sessionUserEmail);
         return repository.findByTitleIsIn(searches)
                 .stream()
+                .distinct()
+                .filter(e -> e.isVisible() || e.getOwner().isMatched(user))
                 .map(this::convert)
                 .collect(Collectors.toList());
     }
