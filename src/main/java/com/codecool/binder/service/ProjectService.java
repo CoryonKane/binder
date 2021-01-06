@@ -30,12 +30,9 @@ public class ProjectService {
                 .build();
     }
 
-    public ProjectDto getProject (Long id, String sessionUserName) {
-//        User user = userService.getUserByEmail(sessionUserName);
+    public ProjectDto getProject (Long id) {
         Project p = repository.getOne(id);
-//        if (p.getOwner().equals(user) || p.isVisible() || p.getOwner().isMatched(user)) {
         return convert(p);
-//        } else throw new BadCredentialsException("Access denied.");
     }
 
     public ProjectDto createProject (Project project, String sessionUserEmail) {
