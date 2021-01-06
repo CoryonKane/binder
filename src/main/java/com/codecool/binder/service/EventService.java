@@ -29,7 +29,8 @@ public class EventService {
                 .id(e.getId())
                 .title(e.getTitle())
                 .description(e.getDescription())
-                .date(e.getDate())
+                .startDate(e.getStartDate())
+                .endDate(e.getEndDate())
                 .owner(e.getOwner().getId())
                 .participants(e.getParticipants().stream().map(User::getId).collect(Collectors.toList()))
                 .build();

@@ -16,7 +16,8 @@ public class EventDto {
     private Long id;
     private String description;
     private String title;
-    private Date date;
+    private Date startDate;
+    private Date endDate;
     private Long owner;
     private List<Long> participants;
 }

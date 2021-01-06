@@ -22,7 +22,10 @@ public class Event {
     @Column(nullable = false)
     private boolean visible;
     @Column(nullable = false)
-    private Date date;
+    private Date startDate;
+    @Column
+    @Builder.Default
+    private Date endDate = null;
     @ManyToOne(optional = false)
     private User owner;
     @ManyToMany

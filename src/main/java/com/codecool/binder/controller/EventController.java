@@ -44,6 +44,7 @@ public class EventController {
 
     @GetMapping("search")
     public List<EventDto> searchEvents (@RequestParam String eventTitle) {
-        return service.searchEvent(eventTitle);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.searchEvent(eventTitle, sessionUserEmail);
     }
 }
