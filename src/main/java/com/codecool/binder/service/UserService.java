@@ -48,6 +48,10 @@ public class UserService {
         return convert(user, sessionUser.isMatched(user));
     }
 
+    public User getUserById (Long id) {
+        return repository.getOne(id);
+    }
+
     public User getUserByEmail(String sessionUserEmail) {
         return repository.findByEmail(sessionUserEmail).orElse(null);
     }

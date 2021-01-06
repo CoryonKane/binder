@@ -46,7 +46,7 @@ public class ProfileService {
 
     public ProfileDto updateProfile (Profile profile, String sessionUserEmail) {
         User user = userService.getUserByEmail(sessionUserEmail);
-        if (profile.getOwner().equals(user)) {
+        if (repository.getOne(profile.getId()).getOwner().equals(user)) {
             repository.save(profile);
             return convert(repository.getOne(profile.getId()));
         } else throw new BadCredentialsException("Access denied.");

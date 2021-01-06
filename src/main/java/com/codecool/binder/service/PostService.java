@@ -44,7 +44,7 @@ public class PostService {
 
     public PostDto updatePost(Post post, String sessionUserEmail) {
         User sessionUser = userService.getUserByEmail(sessionUserEmail);
-        if (post.getOwner().getId().equals(sessionUser.getId())) {
+        if (repository.getOne(post.getId()).getOwner().equals(sessionUser)) {
             repository.save(post);
             return convert(repository.getOne(post.getId()));
         } else throw new BadCredentialsException("Access denied.");

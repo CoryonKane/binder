@@ -48,7 +48,7 @@ public class ProjectService {
 
     public ProjectDto updateProject (Project project, String sessionUserEmail) {
         User user = userService.getUserByEmail(sessionUserEmail);
-        if (project.getOwner().getId().equals(user.getId())) {
+        if (repository.getOne(project.getId()).getOwner().equals(user)) {
             repository.save(project);
             return convert(repository.getOne(project.getId()));
         } else throw new BadCredentialsException("Access denied.");

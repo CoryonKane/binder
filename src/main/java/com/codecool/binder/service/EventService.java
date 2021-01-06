@@ -49,7 +49,7 @@ public class EventService {
 
     public EventDto updateEvent (Event event, String sessionUserEmail) {
         User user = userService.getUserByEmail(sessionUserEmail);
-        if (event.getOwner().equals(user)) {
+        if (repository.getOne(event.getId()).getOwner().equals(user)) {
             repository.save(event);
             return convert(repository.getOne(event.getId()));
         } else throw new BadCredentialsException("Access denied.");

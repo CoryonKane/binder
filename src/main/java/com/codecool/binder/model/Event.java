@@ -25,4 +25,12 @@ public class Event {
     private User owner;
     @ManyToMany
     private Set<User> participants = new HashSet<>();
+
+    public void addParticipant (User user) {
+        this.participants.add(user);
+    }
+
+    public void removeParticipant (User user) {
+        this.participants.remove(user);
+    }
 }
