@@ -5,6 +5,7 @@ import com.codecool.binder.model.UserPassword;
 import com.codecool.binder.model.User;
 import com.codecool.binder.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -45,7 +46,9 @@ public class UserService {
     public UserDto getUserDto(Long id, String sessionUserEmail) {
         User user = repository.getOne(id);
         User sessionUser = getUserByEmail(sessionUserEmail);
-        return convert(user, sessionUser.isMatched(user));
+        if (!user.isBanned(sessionUser)) {
+            return convert(user, sessionUser.isMatched(user));
+        } else throw new AccessDeniedException("Banned user.");
     }
 
     public User getUserById (Long id) {
