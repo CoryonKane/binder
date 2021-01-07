@@ -117,7 +117,8 @@ public class UserService {
         if (sessionUser.equals(target) ||
                 sessionUser.isMatched(target) ||
                 sessionUser.isFollowed(target) ||
-                sessionUser.isBanned(target)) {
+                sessionUser.isBanned(target) ||
+                target.isBanned(sessionUser)){
             return;
         }
         if (sessionUser.isNoped(target)) {
