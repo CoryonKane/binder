@@ -21,7 +21,8 @@ public class PostController {
 
     @GetMapping("{id}")
     public PostDto getPost (@PathVariable("id") Long id) {
-        return service.getProject(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.getProject(id, sessionUserEmail);
     }
 
     @PostMapping("")

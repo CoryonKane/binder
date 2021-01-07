@@ -37,9 +37,12 @@ public class PostService {
                 .build();
     }
 
-    public PostDto getProject(Long id) {
-        Post p = repository.getOne(id);
-        return convert(p);
+    public PostDto getProject(Long id, String sessionUserEmail) {
+        Post post = repository.getOne(id);
+        User user = userService.getUserByEmail(sessionUserEmail);
+        if (!post.getOwner().isBanned(user)) {
+            return convert(post);
+        } else throw new BadCredentialsException("User have no access to this post.");
     }
 
     public PostDto updatePost(Post post, String sessionUserEmail) {
@@ -74,6 +77,7 @@ public class PostService {
         return repository.findByOwnerIsIn(users)
                 .stream()
                 .filter(post -> !post.getOwner().isNoped(sessionUser))
+                .filter(post -> !post.getOwner().isBanned(sessionUser))
                 .map(this::convert)
                 .sorted(Comparator.comparing(PostDto::getDate))
                 .collect(Collectors.toList());
