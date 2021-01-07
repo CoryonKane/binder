@@ -29,7 +29,7 @@ public class Event {
     @Builder.Default
     private Date endDate = null;
     @ManyToOne(optional = false)
-    @Immutable
+    @JoinColumn(name = "owner_id", updatable = false)
     private User owner;
     @ManyToMany
     @JsonIgnore

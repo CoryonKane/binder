@@ -24,6 +24,6 @@ public class Profile {
     @Column(nullable = false)
     private boolean visible;
     @ManyToOne(optional = false)
-    @Immutable
+    @JoinColumn(name = "owner_id", updatable = false)
     private User owner;
 }

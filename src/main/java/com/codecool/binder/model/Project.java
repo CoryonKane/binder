@@ -22,6 +22,6 @@ public class Project {
     private String title;
     private String description;
     @ManyToOne(optional = false)
-    @Immutable
+    @JoinColumn(name = "owner_id", updatable = false)
     private User owner;
 }

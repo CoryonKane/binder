@@ -18,13 +18,13 @@ public class Post {
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne(optional = false)
-    @Immutable
-    private User owner;
     @Column(nullable = false)
     private String title;
     private String description;
     private String pictureUrl;
     @Column(nullable = false, updatable = false)
     private Date date;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "owner_id", updatable = false)
+    private User owner;
 }
