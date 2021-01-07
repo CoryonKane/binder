@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
 
@@ -21,5 +22,6 @@ public class Project {
     private String title;
     private String description;
     @ManyToOne(optional = false)
+    @Immutable
     private User owner;
 }

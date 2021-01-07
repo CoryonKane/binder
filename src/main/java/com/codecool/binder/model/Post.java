@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,11 +19,12 @@ public class Post {
     @GeneratedValue
     private Long id;
     @ManyToOne(optional = false)
+    @Immutable
     private User owner;
     @Column(nullable = false)
     private String title;
     private String description;
     private String pictureUrl;
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Date date;
 }

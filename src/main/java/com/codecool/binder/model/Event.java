@@ -1,6 +1,7 @@
 package com.codecool.binder.model;
 
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -27,6 +28,7 @@ public class Event {
     @Builder.Default
     private Date endDate = null;
     @ManyToOne(optional = false)
+    @Immutable
     private User owner;
     @ManyToMany
     private Set<User> participants = new HashSet<>();
