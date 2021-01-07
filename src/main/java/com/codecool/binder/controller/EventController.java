@@ -47,4 +47,16 @@ public class EventController {
         String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         return service.searchEvent(eventTitle, sessionUserEmail);
     }
+
+    @PutMapping("{id}/add")
+    public void addParticipant (@PathVariable("id") Long eventId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.addParticipant(eventId, sessionUserEmail);
+    }
+
+    @DeleteMapping("{id}/remove")
+    public void removeParticipant (@PathVariable("id") Long eventId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.removeParticipant(eventId, sessionUserEmail);
+    }
 }

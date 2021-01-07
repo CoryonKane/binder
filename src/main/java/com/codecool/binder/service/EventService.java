@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,8 +32,12 @@ public class EventService {
                 .description(e.getDescription())
                 .startDate(e.getStartDate())
                 .endDate(e.getEndDate())
-                .owner(e.getOwner().getId())
-                .participants(e.getParticipants().stream().map(User::getId).collect(Collectors.toList()))
+                .owner(e.getOwner()
+                        .getId())
+                .participants(e.getParticipants()
+                        .stream()
+                        .map(User::getId)
+                        .collect(Collectors.toList()))
                 .build();
     }
 
@@ -61,7 +66,7 @@ public class EventService {
         User user = userService.getUserByEmail(sessionUserEmail);
         if (event.getOwner().equals(user)) {
             repository.deleteById(id);
-        } else throw new BadCredentialsException("Access denied.");
+        } else throw new BadCredentialsException("User not allowed to delete this event.");
     }
 
     public List<EventDto> searchEvent(String search, String sessionUserEmail) {
@@ -70,8 +75,24 @@ public class EventService {
         return repository.findByTitleIsIn(searches)
                 .stream()
                 .distinct()
-                .filter(e -> e.isVisible() || e.getOwner().isMatched(user))
+                .filter(event -> event.isVisible() || event.getOwner().isMatched(user))
                 .map(this::convert)
                 .collect(Collectors.toList());
+    }
+
+    public void addParticipant (Long eventId, String sessionUserEmail) {
+        Event event = repository.getOne(eventId);
+        User user = userService.getUserByEmail(sessionUserEmail);
+        if (event.isVisible() || event.getOwner().isMatched(user)) {
+            event.addParticipant(user);
+            repository.save(event);
+        } else throw new BadCredentialsException("User is not allowed to participate in this event.");
+    }
+
+    public void removeParticipant (Long eventId, String sessionUserEmail) {
+        Event event = repository.getOne(eventId);
+        User user = userService.getUserByEmail(sessionUserEmail);
+        event.removeParticipant(user);
+        repository.save(event);
     }
 }

@@ -5,7 +5,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -124,10 +123,6 @@ public class User {
 
     public void removeBan (User u) {
         this.banList.remove(u);
-    }
-
-    public boolean isPostOwner(Post post) {
-        return this.posts.contains(post);
     }
 
     public boolean isMatched(User u) {

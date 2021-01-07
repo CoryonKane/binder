@@ -20,6 +20,7 @@ public class UserDto {
     private String lastName;
     private String nickName;
     private String profilePicture;
+
     private List<Long> profiles;
     private List<String> interests;
     private List<Long> projects;
