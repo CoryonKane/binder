@@ -30,9 +30,12 @@ public class ProjectService {
                 .build();
     }
 
-    public ProjectDto getProject (Long id) {
-        Project p = repository.getOne(id);
-        return convert(p);
+    public ProjectDto getProject (Long id, String sessionUserEmail) {
+        User user = userService.getUserByEmail(sessionUserEmail);
+        Project post = repository.getOne(id);
+        if (!post.getOwner().isBanned(user)) {
+            return convert(post);
+        } else throw new BadCredentialsException("User has no access to this project.");
     }
 
     public ProjectDto createProject (Project project, String sessionUserEmail) {
