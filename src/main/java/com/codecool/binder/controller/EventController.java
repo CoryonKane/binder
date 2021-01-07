@@ -21,7 +21,8 @@ public class EventController {
 
     @GetMapping("{id}")
     public EventDto getEvent (@PathVariable("id") Long id) {
-        return service.getEventById(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.getEventById(id, sessionUserEmail);
     }
 
     @PostMapping("")

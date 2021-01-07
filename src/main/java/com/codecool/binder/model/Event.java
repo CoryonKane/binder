@@ -1,5 +1,6 @@
 package com.codecool.binder.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
 
@@ -31,6 +32,7 @@ public class Event {
     @Immutable
     private User owner;
     @ManyToMany
+    @JsonIgnore
     private Set<User> participants = new HashSet<>();
 
     public void addParticipant (User user) {
