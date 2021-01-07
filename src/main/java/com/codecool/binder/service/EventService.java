@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,8 +40,12 @@ public class EventService {
                 .build();
     }
 
-    public EventDto getEventById (Long id) {
-        return convert(repository.getOne(id));
+    public EventDto getEventById (Long id, String sessionUserEmail) {
+        User user = userService.getUserByEmail(sessionUserEmail);
+        Event event = repository.getOne(id);
+        if (event.getOwner().isMatched(user) || event.isVisible() || event.getOwner().equals(user)) {
+            return convert(repository.getOne(id));
+        } else throw new BadCredentialsException("User has no access to event.");
     }
 
     public EventDto createEvent (Event event, String sessionUserEmail) {
