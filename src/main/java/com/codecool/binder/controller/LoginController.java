@@ -40,7 +40,7 @@ public class LoginController {
     public ResponseEntity<Object> login(@RequestBody UserCredentials data) {
         try {
             String dataEmail = data.getEmail();
-            UserDto user = userService.getUserDtoByEmail(dataEmail);
+            UserDto user = userService.getUserDtoByEmail(dataEmail, true);
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(dataEmail, data.getPassword()));
             List<String> roles = authentication.getAuthorities()
                     .stream()
@@ -53,7 +53,7 @@ public class LoginController {
             model.put("token", token);
             return ResponseEntity.ok(model);
         } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid username/password supplied");
+            throw new BadCredentialsException("Invalid:" + data.getEmail() + data.getPassword());
         }
     }
 }

@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
@@ -19,8 +17,13 @@ public class Profile {
     @Id
     @GeneratedValue
     private Long id;
+    @Column(nullable = false)
     private String webPage;
+    @Column(nullable = false)
     private String userName;
-    @ManyToOne
+    @Column(nullable = false)
+    private boolean visible;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "owner_id", updatable = false)
     private User owner;
 }

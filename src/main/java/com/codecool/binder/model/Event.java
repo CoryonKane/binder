@@ -1,10 +1,13 @@
 package com.codecool.binder.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -16,10 +19,31 @@ public class Event {
     @GeneratedValue
     private Long id;
     private String description;
+    @Column(nullable = false)
     private String title;
-    private Date date;
-    @ManyToOne
+    @Column(nullable = false)
+    private boolean visible;
+    @Column(nullable = false)
+    private Date startDate;
+    @Column
+    @Builder.Default
+    private Date endDate = null;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "owner_id", updatable = false)
     private User owner;
     @ManyToMany
-    private List<User> participants;
+    @JsonIgnore
+    private Set<User> participants = new HashSet<>();
+
+    public void addParticipant (User user) {
+        this.participants.add(user);
+    }
+
+    public void removeParticipant (User user) {
+        this.participants.remove(user);
+    }
+
+    public boolean isParticipant (User user) {
+        return this.participants.contains(user);
+    }
 }

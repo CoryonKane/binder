@@ -2,12 +2,11 @@ package com.codecool.binder.controller;
 
 import com.codecool.binder.dto.EventDto;
 import com.codecool.binder.model.Event;
-import com.codecool.binder.model.User;
 import com.codecool.binder.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -22,27 +21,43 @@ public class EventController {
 
     @GetMapping("{id}")
     public EventDto getEvent (@PathVariable("id") Long id) {
-        return service.getEventById(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.getEventById(id, sessionUserEmail);
     }
 
     @PostMapping("")
     public EventDto createEvent (@RequestBody Event event) {
-        return service.saveEvent(event);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.createEvent(event, sessionUserEmail);
     }
 
     @PutMapping("")
     public EventDto updateEvent (@RequestBody Event event) {
-        return service.saveEvent(event);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.updateEvent(event, sessionUserEmail);
     }
 
     @DeleteMapping("{id}")
     public void deleteEvent (@PathVariable("id") Long id) {
-        service.deleteEvent(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.deleteEvent(id, sessionUserEmail);
     }
 
     @GetMapping("search")
-    public List<EventDto> searchEvents (@RequestParam String search, Principal principal) {
-        User sessionUser = (User) principal;
-        return service.searchEvent(search, sessionUser);
+    public List<EventDto> searchEvents (@RequestParam String eventTitle) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.searchEvent(eventTitle, sessionUserEmail);
+    }
+
+    @PutMapping("{id}/add")
+    public void addParticipant (@PathVariable("id") Long eventId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.addParticipant(eventId, sessionUserEmail);
+    }
+
+    @DeleteMapping("{id}/remove")
+    public void removeParticipant (@PathVariable("id") Long eventId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.removeParticipant(eventId, sessionUserEmail);
     }
 }

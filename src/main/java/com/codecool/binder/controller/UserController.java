@@ -5,9 +5,9 @@ import com.codecool.binder.model.UserPassword;
 import com.codecool.binder.model.User;
 import com.codecool.binder.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -24,55 +24,100 @@ public class UserController {
 
     // get user by id
     @GetMapping("{id}")
-    public UserDto getUser (@PathVariable("id") Long id, Principal principal) {
-        User sessionUser = (User) principal;
-        return service.getUserDto(id, sessionUser);
+    public UserDto getUser (@PathVariable("id") Long id) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.getUserDto(id, sessionUserEmail);
     }
 
     //update user info
     @PutMapping("")
     public UserDto updateUser (@RequestBody User user) {
-        return service.saveUser(user, true);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.updateUser(user, sessionUserEmail);
     }
 
     //delete user
     @DeleteMapping("{id}")
     public void deleteUser (@PathVariable("id") Long id) {
-        service.deleteUser(id);
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.deleteUser(id, sessionUserEmail);
     }
 
     //get sessionUser's lists
     @GetMapping("lists")
-    public Map<String, List<Long>> getLists (Principal principal) {
-        User sessionUser = (User) principal;
-        return service.getLists(sessionUser);
+    public Map<String, List<Long>> getLists () {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.getLists(sessionUserEmail);
     }
 
     //change user password
     @PutMapping("change-password")
-    public void changeUserPassword (@RequestBody UserPassword userPassword, Principal principal) {
-        User sessionUser = (User) principal;
-        service.changeUserPassword(sessionUser, userPassword);
+    public void changeUserPassword (@RequestBody UserPassword userPassword) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.changeUserPassword(sessionUserEmail, userPassword);
     }
 
     //add match
-    @PostMapping("match/{id}")
-    public void match (@PathVariable("id") Long targetUserId, Principal principal) {
-        User sessionUser = (User) principal;
-        service.match(targetUserId, sessionUser);
+    @PostMapping("match")
+    public void match (@RequestBody Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.match(targetId, sessionUserEmail);
+    }
+
+    //add nope
+    @PostMapping("nope")
+    public void nope (@RequestBody Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.nope(targetId, sessionUserEmail);
+    }
+
+    //remove nope
+    @PostMapping("remove-nope")
+    public void removeNope (@RequestBody Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.removeNope(targetId, sessionUserEmail);
+    }
+
+    //add banned user
+    @PostMapping("ban")
+    public void ban (@RequestBody Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.ban(targetId, sessionUserEmail);
+    }
+
+    //remove ban on user
+    @PostMapping("remove-ban")
+    public void unBan (@RequestBody Long targetId) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        service.removeBan(targetId, sessionUserEmail);
+    }
+
+    //add interest
+    @PutMapping("add-interest")
+    public List<String> addInterest (@RequestBody String interest) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.addInterest(interest, sessionUserEmail);
+    }
+
+    //remove interest
+    @DeleteMapping("remove-interest")
+    public List<String> removeInterest (@RequestBody String interest) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.removeInterest(interest, sessionUserEmail);
     }
 
     //search by interest
     @GetMapping("search-interest")
-    public List<UserDto> searchByInterest (@RequestParam String search, Principal principal) {
-        User sessionUser = (User) principal;
-        return service.getSearchByInterest(search, sessionUser);
+    public List<UserDto> searchByInterest (@RequestParam String interest) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.getSearchByInterest(interest, sessionUserEmail);
     }
 
     //search by name
     @GetMapping("search-name")
-    public List<UserDto> searchByUsername (@RequestParam String name, Principal principal) {
-        User sessionUser = (User) principal;
-        return service.getSearchByUsername(name, sessionUser);
+    public List<UserDto> searchByName(@RequestParam String name) {
+        String sessionUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        return service.getSearchByName(name, sessionUserEmail);
     }
+
 }

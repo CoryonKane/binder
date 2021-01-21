@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Immutable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -20,10 +18,13 @@ public class Post {
     @Id
     @GeneratedValue
     private Long id;
-    @ManyToOne
-    private User owner;
+    @Column(nullable = false)
     private String title;
     private String description;
     private String pictureUrl;
+    @Column(nullable = false, updatable = false)
     private Date date;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "owner_id", updatable = false)
+    private User owner;
 }

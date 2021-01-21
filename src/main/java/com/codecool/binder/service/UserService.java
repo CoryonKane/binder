@@ -1,11 +1,13 @@
 package com.codecool.binder.service;
 
 import com.codecool.binder.dto.UserDto;
+import com.codecool.binder.model.Profile;
+import com.codecool.binder.model.Project;
 import com.codecool.binder.model.UserPassword;
-import com.codecool.binder.model.Post;
 import com.codecool.binder.model.User;
 import com.codecool.binder.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -27,89 +29,198 @@ public class UserService {
     }
 
     public UserDto convert (User u, boolean isVisible) {
-        Set<Long> projects = new HashSet<>();
-        Set<Long> profiles = new HashSet<>();
-        u.getProjects().forEach((k, v) -> {if (v || isVisible) {projects.add(k.getId());}});
-        u.getProfileNames().forEach((k, v) -> {if (v || isVisible) {profiles.add(k.getId());}});
         return UserDto.builder()
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
                 .id(u.getId())
-                .interests(u.getInterests())
+                .interests(new ArrayList<>(u.getInterests()))
                 .nickName(u.getNickName())
                 .profilePicture(u.getProfilePicture())
-                .profiles(profiles)
-                .posts(u.getPosts().stream().map(Post::getId).collect(Collectors.toSet()))
-                .projects(projects)
+                .profiles(u.getProfileNames()
+                        .stream()
+                        .filter(profile -> profile.isVisible() || isVisible)
+                        .map(Profile::getId)
+                        .collect(Collectors.toList()))
+                .projects(u.getProjects()
+                        .stream()
+                        .map(Project::getId)
+                        .collect(Collectors.toList()))
                 .build();
     }
 
-    public UserDto getUserDto(Long id, User sessionUser) {
+    public UserDto getUserDto(Long id, String sessionUserEmail) {
         User user = repository.getOne(id);
-        return convert(user, sessionUser.isMatch(user));
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        if (!user.isBanned(sessionUser)) {
+            return convert(user, sessionUser.isMatched(user));
+        } else throw new AccessDeniedException("Banned user.");
+    }
+
+    public User getUserByEmail(String sessionUserEmail) {
+        return repository.findByEmail(sessionUserEmail).orElse(null);
     }
 
     public UserDto saveUser(User user, boolean isVisible) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         repository.save(user);
-        return convert(user, isVisible);
+        return getUserDtoByEmail(user.getEmail(), isVisible);
     }
 
-    public void deleteUser(Long id) {
-        repository.deleteById(id);
+    public void deleteUser(Long id, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        if (sessionUser.getId().equals(id)) {
+            repository.deleteById(id);
+        } else throw new BadCredentialsException("Invalid user.");
     }
-    
+
     public UserDto registerUser (User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return saveUser(user, true);
+        if (repository.findByEmail(user.getEmail()).isEmpty()) {
+            user.setId(null);
+             return saveUser(user, true);
+        } else {
+            return null;
+        }
     }
 
-    public void changeUserPassword(User sessionUser, UserPassword userPassword) {
-        if (sessionUser.getPassword().equals(passwordEncoder.encode(userPassword.getOldPassword()))) {
+    public UserDto updateUser(User user, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        if (sessionUser.getId().equals(user.getId())) {
+            user.setPassword(sessionUser.getPassword());
+            return saveUser(user, true);
+        } else throw new BadCredentialsException("Invalid user.");
+    }
+
+    public void changeUserPassword(String sessionUserEmail, UserPassword userPassword) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        if (passwordEncoder.matches(userPassword.getOldPassword(), sessionUser.getPassword())) {
             sessionUser.setPassword(passwordEncoder.encode(userPassword.getNewPassword()));
             repository.save(sessionUser);
         } else throw new BadCredentialsException("Wrong username or password.");
     }
 
-    public Map<String, List<Long>> getLists(User sessionUser) {
+    public Map<String, List<Long>> getLists(String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
         Map<String, List<Long>> listMap = new HashMap<>();
         listMap.put("nopeList", sessionUser.getNopeList().stream().map(User::getId).collect(Collectors.toList()));
         listMap.put("matchList", sessionUser.getMatchList().stream().map(User::getId).collect(Collectors.toList()));
         listMap.put("followList", sessionUser.getFollowList().stream().map(User::getId).collect(Collectors.toList()));
         return listMap;
     }
-    
-    public UserDto getUserDtoByEmail(String dataEmail) {
-        return convert(repository.findByEmail(dataEmail).orElseThrow(() -> new UsernameNotFoundException(dataEmail)), true);
+
+    public UserDto getUserDtoByEmail(String dataEmail, boolean isVisible) {
+        return convert(repository.findByEmail(dataEmail).orElseThrow(() -> new UsernameNotFoundException(dataEmail)), isVisible);
     }
 
-    public void match(Long targetUserId, User sessionUser) {
+    public void match(Long targetUserId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
         User target = repository.getOne(targetUserId);
-        if (target.hasMatch(sessionUser)) {
+        if (sessionUser.equals(target) ||
+                sessionUser.isMatched(target) ||
+                sessionUser.isFollowed(target) ||
+                sessionUser.isBanned(target) ||
+                target.isBanned(sessionUser)){
+            return;
+        }
+        if (sessionUser.isNoped(target)) {
+            sessionUser.removeNope(target);
+        }
+        if (target.isFollowed(sessionUser)) {
             target.removeFollow(sessionUser);
             target.addMatch(sessionUser);
             sessionUser.addMatch(target);
+            repository.save(target);
         } else {
             sessionUser.addFollow(target);
         }
+        repository.save(sessionUser);
     }
 
-    public List<UserDto> getSearchByInterest(String search, User sessionUser) {
-        List<String> searches = Arrays.stream(search.split(",")).map(String::trim).collect(Collectors.toList());
+    public void nope(Long targetId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        User target = repository.getOne(targetId);
+        if (sessionUser.equals(target) ||
+                sessionUser.isNoped(target) ||
+                sessionUser.isBanned(target)) {
+            return;
+        }
+        if (sessionUser.isMatched(target)) {
+            sessionUser.removeMatch(target);
+            target.removeMatch(sessionUser);
+            target.addFollow(sessionUser);
+        }
+        if (sessionUser.isFollowed(target)) {
+            sessionUser.removeFollow(target);
+        }
+        sessionUser.addNope(target);
+        repository.save(sessionUser);
+    }
+
+    public void removeNope(Long targetId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        User target = repository.getOne(targetId);
+        sessionUser.removeNope(target);
+        repository.save(sessionUser);
+    }
+
+    public void ban(Long targetId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        User target = repository.getOne(targetId);
+        if (sessionUser.equals(target) || sessionUser.isBanned(target)) {
+            return;
+        }
+        if (sessionUser.isMatched(target)) {
+            sessionUser.removeMatch(target);
+            target.removeMatch(sessionUser);
+        }
+        if (sessionUser.isFollowed(target)) {
+            sessionUser.removeFollow(target);
+        }
+        sessionUser.addBan(target);
+        repository.save(sessionUser);
+    }
+
+    public void removeBan(Long targetId, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        User target = repository.getOne(targetId);
+        sessionUser.removeBan(target);
+        repository.save(sessionUser);
+    }
+
+    public List<UserDto> getSearchByInterest(String interest, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
+        List<String> searches = Arrays.stream(interest.split(",")).map(String::trim).collect(Collectors.toList());
         List<User> users = new ArrayList<>();
-        searches.forEach(s -> {users.addAll(repository.findByInterestsContaining(s));});
+        searches.forEach(s -> users.addAll(repository.findByInterestsContaining(s)));
         return users.stream()
+                .filter(user -> !user.isNoped(sessionUser))
+                .filter(u -> !u.isBanned(sessionUser))
                 .distinct()
-                .map(user -> convert(user, sessionUser.isMatch(user)))
+                .map(user -> convert(user, sessionUser.isMatched(user)))
                 .collect(Collectors.toList());
     }
 
-    public List<UserDto> getSearchByUsername(String name, User sessionUser) {
+    public List<UserDto> getSearchByName(String name, String sessionUserEmail) {
+        User sessionUser = getUserByEmail(sessionUserEmail);
         List<String> names = Arrays.stream(name.split(",")).map(String::trim).collect(Collectors.toList());
         return repository.findByLastNameIsInOrFirstNameIsIn(names, names)
                 .stream()
+                .filter(u -> !u.isBanned(sessionUser))
                 .distinct()
-                .map(u -> convert(u, sessionUser.isMatch(u)))
+                .map(u -> convert(u, sessionUser.isMatched(u)))
                 .collect(Collectors.toList());
+    }
+
+    public List<String> addInterest(String interest, String sessionUserEmail) {
+        User user = getUserByEmail(sessionUserEmail);
+        user.addInterest(interest);
+        repository.save(user);
+        return new ArrayList<>(user.getInterests());
+    }
+
+    public List<String> removeInterest(String interest, String sessionUserEmail) {
+        User user = getUserByEmail(sessionUserEmail);
+        user.removeInterest(interest);
+        repository.save(user);
+        return new ArrayList<>(user.getInterests());
     }
 }

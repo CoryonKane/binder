@@ -10,6 +10,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail (String email);
+    @Query("SELECT u FROM Binder u WHERE ?1 MEMBER OF u.interests")
     List<User> findByInterestsContaining (String interest);
     List<User> findByLastNameIsInOrFirstNameIsIn(Collection<String> lastName, Collection<String> firstName);
 }

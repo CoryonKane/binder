@@ -5,6 +5,8 @@ import com.codecool.binder.model.Post;
 import com.codecool.binder.model.User;
 import com.codecool.binder.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -16,10 +18,12 @@ import java.util.stream.Stream;
 @Service
 public class PostService {
     private final PostRepository repository;
+    private final UserService userService;
 
     @Autowired
-    public PostService(PostRepository repository) {
+    public PostService(PostRepository repository, @Lazy UserService userService) {
         this.repository = repository;
+        this.userService = userService;
     }
 
     public PostDto convert (Post p) {
@@ -33,29 +37,47 @@ public class PostService {
                 .build();
     }
 
-    public PostDto getProject(Long id) {
-        Post p = repository.getOne(id);
-        return convert(p);
+    public PostDto getProject(Long id, String sessionUserEmail) {
+        Post post = repository.getOne(id);
+        User user = userService.getUserByEmail(sessionUserEmail);
+        if (!post.getOwner().isBanned(user)) {
+            return convert(post);
+        } else throw new BadCredentialsException("User have no access to this post.");
     }
 
-    public PostDto savePost(Post post, User sessionUser) {
-        if (post.getDate() != null) {
-            post.setDate(new Date());
-        }
+    public PostDto updatePost(Post post, String sessionUserEmail) {
+        User sessionUser = userService.getUserByEmail(sessionUserEmail);
+        if (repository.getOne(post.getId()).getOwner().equals(sessionUser)) {
+            repository.save(post);
+            return convert(repository.getOne(post.getId()));
+        } else throw new BadCredentialsException("Access denied.");
+    }
+
+    public PostDto createPost (Post post, String sessionUserEmail) {
+        User sessionUser = userService.getUserByEmail(sessionUserEmail);
+        post.setDate(new Date());
+        post.setId(null);
         post.setOwner(sessionUser);
         repository.save(post);
-        return convert(post);
+        return convert(repository.getOne(post.getId()));
     }
 
-    public void deletePost(Long id) {
-        repository.deleteById(id);
+    public void deletePost(Long id, String sessionUserEmail) {
+        User sessionUser = userService.getUserByEmail(sessionUserEmail);
+        Post post = repository.getOne(id);
+        if (post.getOwner().equals(sessionUser)) {
+            repository.deleteById(id);
+        } else throw new BadCredentialsException("Access denied.");
     }
 
-    public List<PostDto> getNews(User sessionUser) {
+    public List<PostDto> getNews(String sessionUserEmail) {
+        User sessionUser = userService.getUserByEmail(sessionUserEmail);
         List<User> users = Stream.concat(sessionUser.getFollowList().stream(), sessionUser.getMatchList().stream())
                 .collect(Collectors.toList());
         return repository.findByOwnerIsIn(users)
                 .stream()
+                .filter(post -> !post.getOwner().isNoped(sessionUser))
+                .filter(post -> !post.getOwner().isBanned(sessionUser))
                 .map(this::convert)
                 .sorted(Comparator.comparing(PostDto::getDate))
                 .collect(Collectors.toList());

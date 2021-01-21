@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,8 +20,8 @@ public class UserDto {
     private String lastName;
     private String nickName;
     private String profilePicture;
-    private Set<Long> profiles;
-    private Set<String> interests;
-    private Set<Long> projects;
-    private Set<Long> posts;
+
+    private List<Long> profiles;
+    private List<String> interests;
+    private List<Long> projects;
 }

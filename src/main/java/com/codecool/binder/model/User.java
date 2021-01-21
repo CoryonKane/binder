@@ -1,9 +1,7 @@
 package com.codecool.binder.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.*;
@@ -13,155 +11,133 @@ import java.util.*;
 @NoArgsConstructor
 @Builder
 @Entity(name = "Binder")
-public class User implements UserDetails {
+public class User {
     @Id
     @GeneratedValue
     // kinda private
     private Long id;
     // public
+    @Column(nullable = false)
     private String firstName;
     // public
+    @Column(nullable = false)
     private String lastName;
     // public
     private String nickName;
     // nagyon private
+    @Column(nullable = false)
     private String password;
     // private
+    @Column(unique = true, nullable = false)
     private String email;
     // public
     private String profilePicture;
     // private
     @ElementCollection
-    private List<SimpleGrantedAuthority> roles;
+    @Builder.Default
+    @EqualsAndHashCode.Exclude
+    private List<String> roles = new ArrayList<>();
+    // private
     // user állíthatja egyenként hogy public vagy private
-    @ElementCollection
+    @OneToMany
     @Singular
-    private Map<Profile, Boolean> profileNames;
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<Profile> profileNames = new HashSet<>();
     // public
     @ElementCollection
     @Singular
-    private Set<String> interests;
+    private Set<String> interests = new HashSet<>();
     // user állíthatja egyenként hogy public vagy private
-    @ElementCollection
+    @OneToMany
     @Singular
-    private Map<Project, Boolean> projects;
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<Project> projects = new HashSet<>();
     // public, followwal news feedbe kerül
     @OneToMany
     @Singular
-    private Set<Post> posts;
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<Post> posts = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("match")
-    private Set<User> matchList;
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<User> matchList = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("follow")
-    private Set<User> followList;
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<User> followList = new HashSet<>();
     // csak saját magadnak settingsben
     @ManyToMany
     @Singular("nope")
-    private Set<User> nopeList;
-    // csak saját magadnak
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<User> nopeList = new HashSet<>();
+    // csak saját magadnak settingsben
+    @ManyToMany
+    @Singular("ban")
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude
+    private Set<User> banList = new HashSet<>();
 
-    public void addProfileName (Profile profile, boolean isPublic) {
-        Profile profInMap = hasProfile(profile);
-        if (profInMap != null) {
-            this.profileNames.remove(profInMap);
-        }
-        this.profileNames.put(profile, isPublic);
+    public void addMatch(User user) {
+        matchList.add(user);
     }
 
-    public void removeProfileName(Profile profile) {
-        this.profileNames.remove(profile);
+    public void removeMatch(User user) {
+        matchList.remove(user);
     }
 
-    private Profile hasProfile(Profile profile) {
-        return this.profileNames.keySet().stream().filter(p -> p.getWebPage().equals(profile.getWebPage())).findFirst().orElse(null);
+    public void addFollow(User user) {
+        followList.add(user);
     }
 
-    public void addProject (Project project, boolean isPublic) {
-        this.projects.put(project, isPublic);
+    public void removeFollow(User user) {
+        followList.remove(user);
     }
 
-    public void removeProject (Project project) {
-        this.projects.remove(project);
+    public void addNope(User user) {
+        nopeList.add(user);
     }
 
-    public boolean addMatch(User user) {
-        return matchList.add(user);
+    public void removeNope(User user) {
+        nopeList.remove(user);
     }
 
-    public boolean removeMatch(User user) {
-        return matchList.remove(user);
+    public void addInterest(String s) {
+        interests.add(s);
     }
 
-    public boolean addFollow(User user) {
-        return followList.add(user);
+    public void removeInterest(String s) {
+        interests.remove(s);
     }
 
-    public boolean removeFollow(User user) {
-        return followList.remove(user);
+    public void addBan (User u) {
+        this.banList.add(u);
     }
 
-    public boolean addNope(User user) {
-        return nopeList.add(user);
+    public void removeBan (User u) {
+        this.banList.remove(u);
     }
 
-    public boolean removeNope(User user) {
-        return nopeList.remove(user);
-    }
-
-    public boolean addPost(Post post) {
-        return posts.add(post);
-    }
-
-    public boolean removePost(Post post) {
-        return posts.remove(post);
-    }
-
-    public boolean addInterest(String s) {
-        return interests.add(s);
-    }
-
-    public boolean removeInterest(String s) {
-        return interests.remove(s);
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
-
-    public boolean hasMatch(User sessionUser) {
-        return this.followList.contains(sessionUser);
-    }
-
-    public boolean isMatch(User u) {
+    public boolean isMatched(User u) {
         return this.matchList.contains(u);
+    }
+
+    public boolean isFollowed(User target) {
+        return this.followList.contains(target);
+    }
+
+    public boolean isNoped(User target) {
+        return this.nopeList.contains(target);
+    }
+
+    public boolean isBanned (User u) {
+        return this.banList.contains(u);
     }
 }
