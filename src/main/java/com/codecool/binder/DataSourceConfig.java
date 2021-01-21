@@ -18,6 +18,8 @@ public class DataSourceConfig {
     public DataSource postgresDataSource() {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(dbUrl);
+        config.setUsername("${spring.datasource.username}");
+        config.setPassword("${spring.datasource.password}");
         return new HikariDataSource(config);
     }
 }
