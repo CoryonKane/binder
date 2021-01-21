@@ -1,6 +1,6 @@
 # Readme
 
-##### This project is under work. This is only a back end part of the project, the front end's link will be added once it has its basic functionalities.
+##### This project is under work. This is only a back end part of the project, the front end's link will be added once it has its basic functionalities. Deployed version can be looked at: https://binder-backend.herokuapp.com/swagger-ui.html#/.
 
 Short description of the project:
 
@@ -21,4 +21,5 @@ Used technologies:
     -PostgreSql
     -Project Lombok
     -Swagger
+    -Heroku
 ***
